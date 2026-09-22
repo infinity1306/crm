@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232D37;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2E3B48;
+}
+
+/* Subtle flat border utility */
+.border-subtle {
+  border-color: #1E262E;
+}
+
+.border-subtle-hover:hover {
+  border-color: #2A3540;
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 1px solid #14B8A6;
+  outline-offset: 1px;
+}
+
+/* Static, dense table styling */
+th {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Utility to hide scrollbars while allowing scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
