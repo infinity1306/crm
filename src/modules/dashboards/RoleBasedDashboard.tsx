@@ -13,6 +13,7 @@ import { CustomizeDashboardModal } from './components/CustomizeDashboardModal';
 import { Badge } from '../../components/ui/Badge';
 import { ShieldCheck, UserCheck, Sparkles, SlidersHorizontal, Lock, Unlock } from 'lucide-react';
 import { AdminLoginGate } from './components/AdminLoginGate';
+import { EmployeeLoginGate } from './components/EmployeeLoginGate';
 import { cn } from '../../utils/cn';
 
 // Dedicated Dashboards
@@ -34,7 +35,7 @@ interface RoleBasedDashboardProps {
 }
 
 export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMode }) => {
-  const { currentUser, employees, updateCurrentUser, switchUserRole, addToast, isAdminAuthenticated, adminLogout } = useCRM();
+  const { currentUser, employees, updateCurrentUser, switchUserRole, addToast, isAdminAuthenticated, adminLogout, isEmployeeAuthenticated } = useCRM();
 
   // Resolve native initial persona from current user attributes
   const initialPersona = useMemo<DashboardPersona>(() => {
@@ -274,10 +275,16 @@ export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMo
           </div>
 
           <Badge 
-            variant={dashboardMode === 'admin' ? (isAdminAuthenticated ? "warning" : "error") : "primary"}
+            variant={
+              dashboardMode === 'admin' 
+                ? (isAdminAuthenticated ? "warning" : "error") 
+                : (isEmployeeAuthenticated ? "primary" : "warning")
+            }
             className="text-[10px] hidden sm:inline-flex uppercase font-mono px-2 py-0.5"
           >
-            {dashboardMode === 'admin' ? (isAdminAuthenticated ? 'Admin Clearance Active' : 'Access Locked • Login Required') : 'Staff Self-Service'}
+            {dashboardMode === 'admin' 
+              ? (isAdminAuthenticated ? 'Admin Clearance Active' : 'Access Locked • Login Required') 
+              : (isEmployeeAuthenticated ? `Staff Active: ${currentUser.name}` : 'Staff Terminal Locked • Sign In Required')}
           </Badge>
         </div>
 
@@ -291,8 +298,20 @@ export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMo
 
       {/* DASHBOARD CONTENT DISPATCHER */}
       {dashboardMode === 'employee' ? (
-        /* DEDICATED EMPLOYEE DASHBOARD */
-        <EmployeeDashboard onSwitchToAdmin={() => setDashboardMode('admin')} />
+        !isEmployeeAuthenticated ? (
+          /* EMPLOYEE SIGN IN GATEWAY */
+          <EmployeeLoginGate 
+            onSuccess={() => {
+              setDashboardMode('employee');
+            }}
+            onSwitchToAdmin={() => {
+              setDashboardMode('admin');
+            }}
+          />
+        ) : (
+          /* DEDICATED EMPLOYEE DASHBOARD */
+          <EmployeeDashboard onSwitchToAdmin={() => setDashboardMode('admin')} />
+        )
       ) : !isAdminAuthenticated ? (
         /* ADMIN LOGIN GATEWAY FOR ACCESS CONTROL */
         <AdminLoginGate 

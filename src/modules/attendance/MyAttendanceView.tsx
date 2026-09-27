@@ -18,6 +18,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { DEFAULT_SHIFTS } from '../../services/attendanceService';
+import { EmployeeLoginGate } from '../dashboards/components/EmployeeLoginGate';
 
 export const MyAttendanceView: React.FC = () => {
   const { 
@@ -30,7 +31,8 @@ export const MyAttendanceView: React.FC = () => {
     punchOut, 
     startBreak, 
     endBreak,
-    todayDateStr
+    todayDateStr,
+    isEmployeeAuthenticated
   } = useCRM();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -93,6 +95,14 @@ export const MyAttendanceView: React.FC = () => {
         { id: '4', time: '13:39', type: 'break_end', title: 'Lunch Break ended' },
         { id: '5', time: '14:10', type: 'task_completed', title: 'Attendance Engine task' },
       ];
+
+  if (!isEmployeeAuthenticated) {
+    return (
+      <div className="max-w-md mx-auto py-8">
+        <EmployeeLoginGate />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

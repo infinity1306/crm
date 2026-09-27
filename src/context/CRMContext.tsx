@@ -12,7 +12,8 @@ import {
   PermissionAction,
   EmployeeNote,
   EmployeeDocument,
-  UserSession
+  UserSession,
+  Department
 } from '../types';
 import { 
   Lead, 
@@ -204,6 +205,19 @@ interface CRMContextType {
   adminLogin: (email: string, passwordOrPin: string) => Promise<{ success: boolean; error?: string }>;
   adminLogout: () => void;
 
+  // Employee Portal Authentication
+  isEmployeeAuthenticated: boolean;
+  employeeLogin: (emailOrId: string, passwordOrPin: string) => Promise<{ success: boolean; error?: string; employee?: Employee }>;
+  employeeRegister: (data: {
+    name: string;
+    email: string;
+    designation: string;
+    department: Department;
+    phone?: string;
+    pin?: string;
+  }) => Promise<{ success: boolean; employee: Employee }>;
+  employeeLogout: () => void;
+
   // Toasts
   toasts: ToastMessage[];
   addToast: (toast: Omit<ToastMessage, 'id'>) => void;
@@ -339,6 +353,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Admin Portal Session Authentication
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
     return sessionStorage.getItem('scl_admin_authenticated') === 'true';
+  });
+
+  // Employee Portal Session Authentication
+  const [isEmployeeAuthenticated, setIsEmployeeAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('scl_employee_authenticated') === 'true';
   });
 
   const [currentUser, setCurrentUser] = useState<Employee>(() => {
@@ -828,6 +847,139 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       type: 'info',
       title: 'Admin Session Locked',
       message: 'Administrative clearance locked. Returning to staff view.'
+    });
+  };
+
+  const employeeLogin = async (
+    emailOrId: string, 
+    passwordOrPin: string
+  ): Promise<{ success: boolean; error?: string; employee?: Employee }> => {
+    const query = emailOrId.trim().toLowerCase();
+    const pin = passwordOrPin.trim();
+
+    if (!query) {
+      return { success: false, error: 'Please enter your work email or employee ID.' };
+    }
+    if (!pin) {
+      return { success: false, error: 'Please enter your passcode or PIN.' };
+    }
+
+    const matched = employees.find(
+      e => e.email.toLowerCase() === query || e.id.toLowerCase() === query
+    );
+
+    if (matched) {
+      const isValid = pin === '1234' || pin === '0000' || pin === 'employee123' || pin === 'admin123' || pin.length >= 4;
+      if (!isValid) {
+        return { success: false, error: 'Invalid PIN. Passcode must be at least 4 digits.' };
+      }
+
+      setCurrentUser(matched);
+      setIsEmployeeAuthenticated(true);
+      sessionStorage.setItem('scl_employee_authenticated', 'true');
+      localStorage.setItem('scl_current_user', JSON.stringify(matched));
+
+      logAudit(
+        'EMPLOYEE_LOGIN',
+        'STAFF_AUTH',
+        matched.id,
+        `Employee ${matched.name} (${matched.email}) authenticated into staff portal.`
+      );
+
+      addToast({
+        type: 'success',
+        title: 'Staff Identity Verified',
+        message: `Welcome, ${matched.name}. Shift controls and workspace unlocked.`
+      });
+
+      return { success: true, employee: matched };
+    }
+
+    return {
+      success: false,
+      error: `No staff record found matching "${emailOrId}". Please verify your credentials or register your profile.`
+    };
+  };
+
+  const employeeRegister = async (data: {
+    name: string;
+    email: string;
+    designation: string;
+    department: Department;
+    phone?: string;
+    pin?: string;
+  }): Promise<{ success: boolean; employee: Employee }> => {
+    const newId = `emp-${Date.now().toString(36)}`;
+    const newEmployee: Employee = {
+      id: newId,
+      name: data.name.trim(),
+      email: data.email.trim().toLowerCase(),
+      phone: data.phone?.trim() || '+91 98000 00000',
+      designation: data.designation.trim() || 'Software Engineer',
+      department: data.department || 'Engineering',
+      role: 'employee',
+      status: 'active',
+      joinedDate: new Date().toISOString().split('T')[0],
+      lastActive: 'Active right now',
+      timezone: 'Asia/Kolkata (IST)',
+      location: 'Headquarters',
+      directReports: 0,
+      skills: ['Operations'],
+      notesCount: 0,
+      documentsCount: 0,
+    };
+
+    setEmployees(prev => {
+      const updated = [...prev, newEmployee];
+      localStorage.setItem('scl_employees', JSON.stringify(updated));
+      return updated;
+    });
+
+    setCurrentUser(newEmployee);
+    setIsEmployeeAuthenticated(true);
+    sessionStorage.setItem('scl_employee_authenticated', 'true');
+    localStorage.setItem('scl_current_user', JSON.stringify(newEmployee));
+
+    setLeaveBalances(prev => ({
+      ...prev,
+      [newId]: {
+        employeeId: newId,
+        annual: { total: 18, used: 0, pending: 0, remaining: 18 },
+        sick: { total: 10, used: 0, pending: 0, remaining: 10 },
+        casual: { total: 7, used: 0, pending: 0, remaining: 7 },
+        unpaid: { used: 0 },
+      }
+    }));
+
+    logAudit(
+      'EMPLOYEE_REGISTER',
+      'STAFF_AUTH',
+      newId,
+      `Employee profile created and verified for ${newEmployee.name} (${newEmployee.email}).`
+    );
+
+    addToast({
+      type: 'success',
+      title: 'Employee Profile Created',
+      message: `Welcome to Star Chain Labs, ${newEmployee.name}! Your workspace is unlocked.`
+    });
+
+    return { success: true, employee: newEmployee };
+  };
+
+  const employeeLogout = () => {
+    setIsEmployeeAuthenticated(false);
+    sessionStorage.removeItem('scl_employee_authenticated');
+    logAudit(
+      'EMPLOYEE_LOGOUT',
+      'STAFF_AUTH',
+      currentUser.id,
+      `Employee ${currentUser.name} signed out of shift terminal.`
+    );
+    addToast({
+      type: 'info',
+      title: 'Terminal Locked',
+      message: 'Employee session signed out. Please log in to check in or view your dashboard.'
     });
   };
 
@@ -3208,6 +3360,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       isAdminAuthenticated,
       adminLogin,
       adminLogout,
+      isEmployeeAuthenticated,
+      employeeLogin,
+      employeeRegister,
+      employeeLogout,
       currentUser,
       employees,
       invitations,

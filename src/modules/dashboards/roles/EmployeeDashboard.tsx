@@ -19,6 +19,7 @@ import {
   ShieldCheck, 
   Sparkles,
   History,
+  LogOut,
   AlertCircle
 } from 'lucide-react';
 import { PunchControlWidget } from '../../attendance/PunchControlWidget';
@@ -45,7 +46,8 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
     leaveBalances,
     navigateTo, 
     addToast,
-    todayDateStr
+    todayDateStr,
+    employeeLogout
   } = useCRM();
 
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
@@ -219,6 +221,17 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
             >
               <History className="w-3.5 h-3.5 text-slate-950" />
               <span>Full Attendance Log</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={employeeLogout}
+              className="text-xs border-crm-border text-crm-textMuted hover:text-red-400 hover:border-red-500/40 gap-1.5"
+              title="Lock terminal and sign out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Lock / Sign Out</span>
             </Button>
           </div>
         </div>

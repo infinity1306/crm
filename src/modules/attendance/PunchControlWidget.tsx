@@ -13,6 +13,7 @@ import {
   CheckSquare, 
   Timer,
   Clock,
+  Lock,
   ChevronDown
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -37,7 +38,8 @@ export const PunchControlWidget: React.FC<PunchControlWidgetProps> = ({ compact 
     punchOut, 
     startBreak, 
     endBreak,
-    todayDateStr
+    todayDateStr,
+    isEmployeeAuthenticated
   } = useCRM();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -93,6 +95,20 @@ export const PunchControlWidget: React.FC<PunchControlWidgetProps> = ({ compact 
     month: 'long',
     year: 'numeric'
   });
+
+  if (!isEmployeeAuthenticated) {
+    return (
+      <div className={`bg-crm-card border border-crm-border rounded-xl ${compact ? 'p-4' : 'p-6'} shadow-sm relative text-center`}>
+        <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-turquoise/10 border border-turquoise/20 flex items-center justify-center text-turquoise">
+          <Clock className="w-6 h-6" />
+        </div>
+        <h3 className="text-sm font-bold text-crm-text">Staff Sign-In Required</h3>
+        <p className="text-xs text-crm-textMuted mt-1 mb-2 max-w-xs mx-auto">
+          Please sign into your employee terminal to start or stop your shift.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={`bg-crm-card border border-crm-border rounded-xl ${compact ? 'p-4' : 'p-6'} shadow-sm relative`}>
