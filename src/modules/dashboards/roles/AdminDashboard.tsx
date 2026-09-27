@@ -329,7 +329,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* 4. APPROVALS DESK: PENDING CORRECTIONS & LEAVES (2 COLUMNS) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Pending Attendance Corrections */}
-        <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm">
+        <div className="figma-card p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -399,7 +399,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* Right: Pending Leave Requests */}
-        <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm">
+        <div className="figma-card p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">

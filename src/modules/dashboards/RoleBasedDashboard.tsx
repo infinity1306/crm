@@ -228,11 +228,12 @@ export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMo
 
   return (
     <div className="p-4 sm:p-6 max-w-[1600px] mx-auto min-h-[calc(100vh-3.5rem)] space-y-6">
-      {/* SEPARATE DASHBOARD SELECTOR BANNER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-crm-card border border-crm-border p-2.5 rounded-xl shadow-sm">
-        <div className="flex items-center gap-2">
+      {/* SEPARATE DASHBOARD SELECTOR BANNER — FIGMA GLASS PILL DOCK */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 figma-glass p-3 rounded-2xl border border-white/10 shadow-xl backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute -top-12 -left-12 w-48 h-48 bg-turquoise/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="flex items-center gap-3 relative z-10">
           {/* Segmented Control */}
-          <div className="inline-flex p-1 bg-crm-surface rounded-lg border border-crm-border/80 shadow-inner">
+          <div className="figma-segmented-control inline-flex items-center">
             <button
               onClick={() => {
                 setDashboardMode('admin');
@@ -243,10 +244,10 @@ export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMo
                 });
               }}
               className={cn(
-                "flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200",
                 dashboardMode === 'admin'
-                  ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/20"
-                  : "text-crm-textMuted hover:text-crm-text hover:bg-crm-surfaceHover"
+                  ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold shadow-lg shadow-amber-500/30 figma-glow-amber scale-[1.02]"
+                  : "text-crm-textMuted hover:text-crm-text hover:bg-white/5"
               )}
             >
               {isAdminAuthenticated ? <ShieldCheck className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5 text-amber-400" />}
@@ -263,10 +264,10 @@ export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMo
                 });
               }}
               className={cn(
-                "flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200",
                 dashboardMode === 'employee'
-                  ? "bg-turquoise text-slate-950 font-bold shadow-md shadow-turquoise/20"
-                  : "text-crm-textMuted hover:text-crm-text hover:bg-crm-surfaceHover"
+                  ? "bg-gradient-to-r from-turquoise to-emerald-400 text-slate-950 font-bold shadow-lg shadow-turquoise/30 figma-glow-turquoise scale-[1.02]"
+                  : "text-crm-textMuted hover:text-crm-text hover:bg-white/5"
               )}
             >
               <UserCheck className="w-3.5 h-3.5" />

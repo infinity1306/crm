@@ -163,8 +163,10 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
 
   return (
     <div className="space-y-6">
-      {/* 1. EMPLOYEE HERO BANNER */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-crm-card via-crm-surface to-crm-card border border-turquoise/20 rounded-xl p-5 shadow-sm">
+      {/* 1. EMPLOYEE HERO BANNER — FIGMA GLASS */}
+      <div className="relative overflow-hidden figma-glass border border-turquoise/30 rounded-2xl p-6 shadow-xl backdrop-blur-xl">
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-turquoise/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Avatar name={currentUser.name} size="lg" className="border-2 border-turquoise shadow-md ring-2 ring-turquoise/20" />
@@ -241,7 +243,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Interactive Punch Control Widget (7 cols) */}
         <div className="lg:col-span-7">
-          <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm h-full flex flex-col justify-between">
+          <div className="figma-card p-6 rounded-2xl h-full flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-turquoise/10 border border-turquoise/30 flex items-center justify-center text-turquoise">
@@ -263,7 +265,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
 
         {/* Right Column: Shift Details & Location Schedule (5 cols) */}
         <div className="lg:col-span-5">
-          <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm h-full flex flex-col justify-between">
+          <div className="figma-card p-6 rounded-2xl h-full flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3 border-b border-crm-border/60 pb-3">
                 <div className="flex items-center gap-2">
@@ -411,7 +413,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
       {/* 4. THIRD ROW: MY TASKS & MY PROJECTS (2 COLUMNS) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Today's Assigned Tasks Checklist */}
-        <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm">
+        <div className="figma-card p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-turquoise/10 border border-turquoise/20 flex items-center justify-center text-turquoise">
@@ -497,7 +499,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
         </div>
 
         {/* Right: My Active Projects */}
-        <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm">
+        <div className="figma-card p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
@@ -559,7 +561,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
       {/* 5. FOURTH ROW: DAILY STANDUP & RECENT PUNCHES (2 COLUMNS) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Daily Standup Work Update Form */}
-        <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm">
+        <div className="figma-card p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
@@ -655,7 +657,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
         </div>
 
         {/* Right: Recent Punch History & Correction Status */}
-        <div className="bg-crm-card border border-crm-border rounded-xl p-5 shadow-sm">
+        <div className="figma-card p-6 rounded-2xl">
           <div className="flex items-center justify-between mb-4 border-b border-crm-border/60 pb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">

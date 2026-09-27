@@ -87,12 +87,12 @@ export const TopNav: React.FC = () => {
   ];
 
   return (
-    <header className="h-14 bg-crm-card border-b border-crm-border flex items-center justify-between px-5 sticky top-0 z-20 select-none">
+    <header className="h-14 figma-glass border-b border-white/10 flex items-center justify-between px-5 sticky top-0 z-20 select-none backdrop-blur-xl shadow-sm">
       {/* Left: Global Search Command Palette Button */}
       <div className="flex items-center gap-4 flex-1 max-w-xl">
         <button
           onClick={() => setCommandPaletteOpen(true)}
-          className="w-full flex items-center justify-between px-3 py-1.5 bg-crm-surface hover:bg-crm-surfaceHover border border-crm-border hover:border-crm-borderHover rounded-md text-xs text-crm-textMuted group transition-colors"
+          className="w-full flex items-center justify-between px-3.5 py-1.5 bg-crm-surface/70 hover:bg-crm-surface border border-white/5 hover:border-turquoise/40 rounded-lg text-xs text-crm-textMuted group transition-all shadow-inner"
         >
           <div className="flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-crm-textMuted group-hover:text-crm-text" />
