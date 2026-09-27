@@ -7,6 +7,7 @@ import { InviteEmployeeModal } from './modules/team/InviteEmployeeModal';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { OverviewDashboard } from './modules/overview/OverviewDashboard';
 import { RoleBasedDashboard } from './modules/dashboards';
+import { PortalAuthPage } from './modules/auth/PortalAuthPage';
 import { TeamDirectory } from './modules/team/TeamDirectory';
 import { EmployeeProfile } from './modules/team/EmployeeProfile';
 import { RolesPermissions } from './modules/settings/RolesPermissions';
@@ -75,7 +76,7 @@ import { Button } from './components/ui/Button';
 import { Menu, X, Sparkles, ShieldAlert } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { currentPath, navigateTo, currentUser } = useCRM();
+  const { currentPath, navigateTo, currentUser, isAuthenticated } = useCRM();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu on route change
@@ -345,6 +346,16 @@ export const App: React.FC = () => {
     // Default fallback to Role-Based Dashboard
     return <RoleBasedDashboard />;
   };
+
+  // Full-Screen Authentication Gateway for unauthenticated visitors
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen w-screen bg-crm-bg text-crm-text flex items-center justify-center">
+        <PortalAuthPage />
+        <ToastContainer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-crm-bg text-crm-text">

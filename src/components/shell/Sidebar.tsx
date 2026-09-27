@@ -17,6 +17,7 @@ import {
   Settings, 
   ShieldCheck, 
   Lock,
+  LogOut,
   Building2, 
   History, 
   Layers,
@@ -64,6 +65,8 @@ export const Sidebar: React.FC = () => {
   const { 
     currentUser,
     isAdminAuthenticated,
+    adminLogout,
+    employeeLogout,
     currentPath, 
     navigateTo, 
     isSidebarCollapsed, 
@@ -502,26 +505,57 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Footer */}
       <div className="p-3 border-t border-crm-border flex-shrink-0 bg-crm-card">
         {isSidebarCollapsed ? (
-          <button
-            onClick={() => setSidebarCollapsed(false)}
-            title="Expand Sidebar"
-            className="w-full flex items-center justify-center p-2 rounded text-crm-textMuted hover:text-crm-text hover:bg-crm-surface transition-colors"
-          >
-            <PanelLeft className="w-4 h-4" />
-          </button>
+          <div className="space-y-1">
+            <button
+              onClick={() => setSidebarCollapsed(false)}
+              title="Expand Sidebar"
+              className="w-full flex items-center justify-center p-2 rounded text-crm-textMuted hover:text-crm-text hover:bg-crm-surface transition-colors"
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                if (isAdminAuthenticated) {
+                  adminLogout();
+                } else {
+                  employeeLogout();
+                }
+              }}
+              title="Sign Out"
+              className="w-full flex items-center justify-center p-2 rounded text-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         ) : (
-          <div className="px-2 py-1.5 rounded bg-crm-surface/50 border border-crm-border/60 flex items-center justify-between">
-            <div className="min-w-0">
-              <p className="text-[10px] text-crm-textSecondary font-medium tracking-tight truncate">
-                Build Better Together.
-              </p>
-              <p className="text-[9px] font-mono text-crm-textMuted uppercase tracking-wider mt-0.5 truncate">
-                STAR CHAIN LABS
-              </p>
+          <div className="space-y-2">
+            <div className="px-2 py-1.5 rounded bg-crm-surface/50 border border-crm-border/60 flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-[10px] text-crm-textSecondary font-medium tracking-tight truncate">
+                  Build Better Together.
+                </p>
+                <p className="text-[9px] font-mono text-crm-textMuted uppercase tracking-wider mt-0.5 truncate">
+                  STAR CHAIN LABS
+                </p>
+              </div>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-turquoise/10 text-turquoise border border-turquoise/25 flex-shrink-0 ml-1">
+                {activeProfile.badge}
+              </span>
             </div>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-turquoise/10 text-turquoise border border-turquoise/25 flex-shrink-0 ml-1">
-              {activeProfile.badge}
-            </span>
+
+            <button
+              onClick={() => {
+                if (isAdminAuthenticated) {
+                  adminLogout();
+                } else {
+                  employeeLogout();
+                }
+              }}
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-medium text-red-400/90 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20 transition-all"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{isAdminAuthenticated ? 'Sign Out / Lock Admin' : 'Sign Out / Lock Terminal'}</span>
+            </button>
           </div>
         )}
       </div>

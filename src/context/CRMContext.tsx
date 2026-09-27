@@ -200,7 +200,8 @@ interface CRMContextType {
   isSidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean | ((prev: boolean) => boolean)) => void;
   
-  // Admin Portal Authentication
+  // Authentication State
+  isAuthenticated: boolean;
   isAdminAuthenticated: boolean;
   adminLogin: (email: string, passwordOrPin: string) => Promise<{ success: boolean; error?: string }>;
   adminLogout: () => void;
@@ -359,6 +360,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isEmployeeAuthenticated, setIsEmployeeAuthenticated] = useState<boolean>(() => {
     return sessionStorage.getItem('scl_employee_authenticated') === 'true';
   });
+
+  const isAuthenticated = isAdminAuthenticated || isEmployeeAuthenticated;
 
   const [staffPins, setStaffPins] = useState<Record<string, string>>(() => {
     const saved = localStorage.getItem('scl_staff_pins');
@@ -3371,6 +3374,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <CRMContext.Provider value={{
+      isAuthenticated,
       isAdminAuthenticated,
       adminLogin,
       adminLogout,

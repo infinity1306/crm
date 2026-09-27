@@ -32,6 +32,10 @@ export const TopNav: React.FC = () => {
     attendanceRecords,
     punchIn,
     punchOut,
+    isAdminAuthenticated,
+    adminLogout,
+    isEmployeeAuthenticated,
+    employeeLogout,
     addToast,
     updateCurrentUser,
     notifications, 
@@ -409,12 +413,16 @@ export const TopNav: React.FC = () => {
               <button
                 onClick={() => {
                   setUserMenuOpen(false);
-                  navigateTo('/app/profile');
+                  if (isAdminAuthenticated) {
+                    adminLogout();
+                  } else {
+                    employeeLogout();
+                  }
                 }}
-                className="w-full flex items-center gap-2.5 px-4 py-2 text-red-400 hover:bg-red-950/30 transition-colors text-left"
+                className="w-full flex items-center gap-2.5 px-4 py-2 text-red-400 hover:bg-red-950/30 transition-colors text-left font-medium"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
+                <span>{isAdminAuthenticated ? 'Lock Admin Session & Sign Out' : 'Lock Terminal & Sign Out'}</span>
               </button>
             </div>
           )}
