@@ -10,11 +10,8 @@ import {
   Key, 
   ArrowLeft, 
   AlertCircle, 
-  Sparkles, 
   Eye, 
   EyeOff, 
-  Zap,
-  CheckCircle2,
   Building2
 } from 'lucide-react';
 
@@ -24,16 +21,21 @@ interface AdminLoginGateProps {
 }
 
 export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({ onSuccess, onCancel }) => {
-  const { adminLogin, navigateTo, addToast } = useCRM();
+  const { adminLogin } = useCRM();
 
-  const [email, setEmail] = useState('admin@starchainlabs.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      setError('Please provide both administrator email and passcode.');
+      return;
+    }
+
     setError(null);
     setIsLoading(true);
 
@@ -45,27 +47,14 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({ onSuccess, onCan
         setError(res.error || 'Invalid administrator credentials. Access denied.');
       }
     } catch (err: any) {
-      setError(err?.message || 'Authentication error.');
+      setError(err?.message || 'Authentication service error.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleQuickDemoLogin = async () => {
-    setEmail('admin@starchainlabs.com');
-    setPassword('admin123');
-    setIsLoading(true);
-    setError(null);
-
-    const res = await adminLogin('admin@starchainlabs.com', 'admin123');
-    setIsLoading(false);
-    if (res.success && onSuccess) {
-      onSuccess();
-    }
-  };
-
   return (
-    <div className="min-h-[560px] flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-[520px] flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md bg-gradient-to-b from-crm-card to-crm-surface border border-amber-500/30 rounded-2xl shadow-2xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-md">
         {/* Ambient Top Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
@@ -112,7 +101,7 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({ onSuccess, onCan
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@starchainlabs.com"
+                placeholder="admin@company.com"
                 required
                 className="pl-9 text-xs bg-crm-surface/90 border-crm-border focus:border-amber-500/60"
               />
@@ -120,12 +109,9 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({ onSuccess, onCan
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-[11px] font-semibold text-crm-textMuted uppercase tracking-wider">
-                Admin Passcode / PIN
-              </label>
-              <span className="text-[10px] text-amber-400 font-mono">Default: admin123</span>
-            </div>
+            <label className="block text-[11px] font-semibold text-crm-textMuted uppercase tracking-wider mb-1.5">
+              Admin Passcode / PIN
+            </label>
             <div className="relative">
               <Key className="w-4 h-4 text-crm-textMuted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <Input
@@ -158,19 +144,6 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({ onSuccess, onCan
             <span>{isLoading ? "Verifying Credentials..." : "Authenticate & Unlock Portal"}</span>
           </Button>
 
-          {/* Quick Demo 1-Click Login Pill */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={handleQuickDemoLogin}
-              disabled={isLoading}
-              className="w-full py-2 px-3 rounded-lg border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400 fill-current" />
-              <span>1-Click Demo Admin Login (admin123)</span>
-            </button>
-          </div>
-
           {/* Return to Employee Workspace */}
           {onCancel && (
             <div className="pt-2 text-center border-t border-crm-border/60">
@@ -190,7 +163,7 @@ export const AdminLoginGate: React.FC<AdminLoginGateProps> = ({ onSuccess, onCan
         <div className="mt-6 pt-4 border-t border-crm-border/60 text-center">
           <p className="text-[10px] text-crm-textMuted flex items-center justify-center gap-1.5">
             <Building2 className="w-3 h-3 text-amber-400" />
-            <span>Star Chain Labs • Immutable Audit Logging Enabled</span>
+            <span>Enterprise Access Control • 256-Bit Cryptographic Ledger</span>
           </p>
         </div>
       </div>

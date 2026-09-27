@@ -318,6 +318,23 @@ interface CRMContextType {
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
 
 export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Purge legacy demo cache from browser storage for production readiness
+  if (typeof window !== 'undefined') {
+    const PROD_CACHE_VERSION = 'scl_v5_clean_prod';
+    if (localStorage.getItem('scl_cache_version') !== PROD_CACHE_VERSION) {
+      const demoKeys = [
+        'scl_leads', 'scl_contacts', 'scl_companies', 'scl_deals',
+        'scl_meetings', 'scl_followups', 'scl_conversations',
+        'scl_projects', 'scl_tasks', 'scl_work_updates', 'scl_internal_tickets',
+        'scl_attendance_records', 'scl_leave_requests', 'scl_correction_requests',
+        'scl_exceptions', 'scl_invoices', 'scl_payments', 'scl_expenses',
+        'scl_employees', 'scl_notifications', 'scl_activity_events', 'scl_audit_logs',
+        'scl_invitations', 'scl_current_user', 'scl_notes', 'scl_documents', 'scl_sessions'
+      ];
+      demoKeys.forEach(k => localStorage.removeItem(k));
+      localStorage.setItem('scl_cache_version', PROD_CACHE_VERSION);
+    }
+  }
   // Phase 1 state with localStorage fallback
   // Admin Portal Session Authentication
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {

@@ -57,7 +57,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
   const [inProgressWork, setInProgressWork] = useState('');
   const [blockers, setBlockers] = useState('');
   const [nextWork, setNextWork] = useState('');
-  const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || 'p-1');
+  const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || '');
   const [isStandupSubmitted, setIsStandupSubmitted] = useState(false);
 
   // Today's record for current user
@@ -623,9 +623,13 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
                     onChange={e => setSelectedProjectId(e.target.value)}
                     className="bg-crm-surface border border-crm-border text-crm-text text-xs rounded px-2 py-1"
                   >
-                    {projects.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
+                    {projects.length > 0 ? (
+                      projects.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))
+                    ) : (
+                      <option value="">General Workstream</option>
+                    )}
                   </select>
                 </div>
 
@@ -672,7 +676,14 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
                 </tr>
               </thead>
               <tbody className="divide-y divide-crm-border/30">
-                {myHistory.map(rec => {
+                {myHistory.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-crm-textMuted text-xs">
+                      No punch records found. Clock in to record your shift.
+                    </td>
+                  </tr>
+                ) : (
+                  myHistory.map(rec => {
                   const hrs = Math.floor(rec.totalWorkingMinutes / 60);
                   const mins = rec.totalWorkingMinutes % 60;
                   return (
@@ -699,7 +710,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
             </table>
           </div>
