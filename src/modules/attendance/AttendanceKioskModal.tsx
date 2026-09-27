@@ -50,7 +50,7 @@ export const AttendanceKioskModal: React.FC<AttendanceKioskModalProps> = ({ isOp
     if (!selectedEmpId) return;
 
     if (pin !== '1234' && pin !== '0000') {
-      setFeedback({ type: 'error', message: 'Invalid 4-digit Kiosk PIN. (Demo PIN: 1234)' });
+      setFeedback({ type: 'error', message: 'Invalid 4-digit Staff PIN. Please check with your supervisor.' });
       setPin('');
       return;
     }
@@ -146,7 +146,7 @@ export const AttendanceKioskModal: React.FC<AttendanceKioskModalProps> = ({ isOp
             </div>
 
             <div className="text-center space-y-2">
-              <div className="text-xs text-slate-400">Enter your 4-digit Kiosk PIN (Demo PIN: 1234)</div>
+              <div className="text-xs text-slate-400">Enter your 4-digit Staff Kiosk PIN</div>
               <div className="flex justify-center gap-3 py-2">
                 {[0, 1, 2, 3].map(i => (
                   <div

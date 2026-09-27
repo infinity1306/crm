@@ -19,9 +19,9 @@ export const MeetingOutcomeModal: React.FC<MeetingOutcomeModalProps> = ({
 }) => {
   const { recordMeetingOutcome, addToast } = useCRM();
 
-  const [outcome, setOutcome] = useState(meeting.outcome || 'Product demo successfully delivered. Technical team validated smart contract throughput.');
-  const [clientResponse, setClientResponse] = useState(meeting.clientResponse || 'Enthusiastic; requested enterprise SLA tier and commercial breakdown.');
-  const [nextAction, setNextAction] = useState(meeting.nextAction || 'Prepare and dispatch revised proposal.');
+  const [outcome, setOutcome] = useState(meeting.outcome || '');
+  const [clientResponse, setClientResponse] = useState(meeting.clientResponse || '');
+  const [nextAction, setNextAction] = useState(meeting.nextAction || '');
   const [nextFollowUp, setNextFollowUp] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 3);

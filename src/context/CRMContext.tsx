@@ -360,6 +360,11 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return sessionStorage.getItem('scl_employee_authenticated') === 'true';
   });
 
+  const [staffPins, setStaffPins] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem('scl_staff_pins');
+    return saved ? JSON.parse(saved) : { 'emp-admin': 'admin123' };
+  });
+
   const [currentUser, setCurrentUser] = useState<Employee>(() => {
     const saved = localStorage.getItem('scl_current_user');
     return saved ? JSON.parse(saved) : INITIAL_CURRENT_USER;
@@ -800,7 +805,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     const isMasterEmail = trimmedEmail === 'admin@starchainlabs.com' || trimmedEmail === 'admin';
-    const isValidPass = trimmedPass === 'admin123' || trimmedPass === 'admin@2026' || trimmedPass === '9988' || trimmedPass === 'password';
+    const adminPass = (import.meta as any).env?.VITE_ADMIN_PASSCODE || 'admin123';
+    const isValidPass = trimmedPass === adminPass || trimmedPass === 'admin@2026';
 
     if ((matchedAdmin || isMasterEmail) && isValidPass) {
       setIsAdminAuthenticated(true);
@@ -869,9 +875,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     if (matched) {
-      const isValid = pin === '1234' || pin === '0000' || pin === 'employee123' || pin === 'admin123' || pin.length >= 4;
+      const assignedPin = staffPins[matched.id] || (matched.role === 'super_admin' || matched.role === 'admin' ? 'admin123' : '1234');
+      const isValid = pin === assignedPin || pin === 'admin123';
       if (!isValid) {
-        return { success: false, error: 'Invalid PIN. Passcode must be at least 4 digits.' };
+        return { success: false, error: 'Incorrect PIN or passcode for this employee account.' };
       }
 
       setCurrentUser(matched);
@@ -939,6 +946,13 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsEmployeeAuthenticated(true);
     sessionStorage.setItem('scl_employee_authenticated', 'true');
     localStorage.setItem('scl_current_user', JSON.stringify(newEmployee));
+
+    const userPin = data.pin?.trim() || '1234';
+    setStaffPins(prev => {
+      const updated = { ...prev, [newId]: userPin };
+      localStorage.setItem('scl_staff_pins', JSON.stringify(updated));
+      return updated;
+    });
 
     setLeaveBalances(prev => ({
       ...prev,

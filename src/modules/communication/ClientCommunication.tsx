@@ -47,8 +47,8 @@ export const ClientCommunication: React.FC = () => {
 
   const activeConversation = conversations.find(c => c.id === activeConversationId) || conversations[0];
   const activeClientName = activeConversation ? (activeConversation.clientName || activeConversation.contactName || 'Client') : '';
-  const activeEmail = activeConversation ? (activeConversation.clientEmail || activeConversation.contactEmail || 'client@enterprise.com') : '';
-  const activePhone = activeConversation ? (activeConversation.clientPhone || '+91 98450 12345') : '';
+  const activeEmail = activeConversation ? (activeConversation.clientEmail || activeConversation.contactEmail || '') : '';
+  const activePhone = activeConversation ? (activeConversation.clientPhone || '') : '';
 
   const filteredConversations = conversations.filter(c => {
     const cName = c.clientName || c.contactName || '';

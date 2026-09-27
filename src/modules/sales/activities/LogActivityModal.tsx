@@ -25,8 +25,8 @@ export const LogActivityModal: React.FC<LogActivityModalProps> = ({
   const [type, setType] = useState<CRMActivityType>('call');
   const [clientName, setClientName] = useState(defaultClientName || (leads[0]?.name ?? ''));
   const [duration, setDuration] = useState('20 mins');
-  const [outcome, setOutcome] = useState('Product demo delivered. Client requested commercial proposal.');
-  const [nextAction, setNextAction] = useState('Send formal pricing schedule by Thursday');
+  const [outcome, setOutcome] = useState('');
+  const [nextAction, setNextAction] = useState('');
   const [nextFollowUp, setNextFollowUp] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 3);

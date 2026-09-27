@@ -24,12 +24,12 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
 }) => {
   const { employees, currentUser, scheduleMeeting, addToast } = useCRM();
 
-  const [title, setTitle] = useState('Client Technical Discovery & Architecture Review');
+  const [title, setTitle] = useState('');
   const [type, setType] = useState<MeetingType>('online');
-  const [meetingUrl, setMeetingUrl] = useState('https://meet.google.com/scl-demo-session');
+  const [meetingUrl, setMeetingUrl] = useState('');
   const [location, setLocation] = useState('');
-  const [clientName, setClientName] = useState(defaultClientName || 'Vikram Malhotra');
-  const [companyName, setCompanyName] = useState(defaultCompanyName || 'NextGen Systems');
+  const [clientName, setClientName] = useState(defaultClientName || '');
+  const [companyName, setCompanyName] = useState(defaultCompanyName || '');
   const [hostId, setHostId] = useState(currentUser?.id || (employees[0]?.id ?? ''));
   const [date, setDate] = useState(() => {
     const d = new Date();
@@ -38,7 +38,7 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
   });
   const [time, setTime] = useState('03:30 PM');
   const [duration, setDuration] = useState('45 mins');
-  const [agenda, setAgenda] = useState('Evaluate private blockchain node deployment requirements and SLA expectations.');
+  const [agenda, setAgenda] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
