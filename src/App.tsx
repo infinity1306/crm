@@ -85,7 +85,16 @@ export const App: React.FC = () => {
 
   // Route Dispatcher
   const renderContent = () => {
-    // Exact routes - Role-Based Dashboard & Foundation
+    // Explicit Admin and Employee Dashboard Routes
+    if (currentPath === '/app/admin-dashboard') {
+      return <RoleBasedDashboard forcedMode="admin" />;
+    }
+
+    if (currentPath === '/app/employee-dashboard') {
+      return <RoleBasedDashboard forcedMode="employee" />;
+    }
+
+    // Role-Based Default Landing
     if (currentPath === '/' || currentPath === '/app' || currentPath === '/app/dashboard' || currentPath === '/app/overview') {
       return <RoleBasedDashboard />;
     }
@@ -236,6 +245,9 @@ export const App: React.FC = () => {
     }
 
     if (currentPath === '/app/attendance' || currentPath === '/app/people/attendance') {
+      if (currentUser.role === 'employee') {
+        return <MyAttendanceView />;
+      }
       return <AttendanceDashboard />;
     }
 

@@ -10,10 +10,16 @@ import {
 import { DashboardHeader } from './components/DashboardHeader';
 import { RoleAlertsBanner } from './components/RoleAlertsBanner';
 import { CustomizeDashboardModal } from './components/CustomizeDashboardModal';
+import { Badge } from '../../components/ui/Badge';
+import { ShieldCheck, UserCheck, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { cn } from '../../utils/cn';
 
-// 9 Role Dashboard Views
-import { SuperAdminDashboard } from './roles/SuperAdminDashboard';
+// Dedicated Dashboards
 import { AdminDashboard } from './roles/AdminDashboard';
+import { EmployeeDashboard } from './roles/EmployeeDashboard';
+
+// Role-Specific Views
+import { SuperAdminDashboard } from './roles/SuperAdminDashboard';
 import { ManagerDashboard } from './roles/ManagerDashboard';
 import { SalesExecutiveDashboard } from './roles/SalesExecutiveDashboard';
 import { SalesManagerDashboard } from './roles/SalesManagerDashboard';
@@ -22,7 +28,11 @@ import { FinanceDashboard } from './roles/FinanceDashboard';
 import { HRDashboard } from './roles/HRDashboard';
 import { ClientDashboard } from './roles/ClientDashboard';
 
-export const RoleBasedDashboard: React.FC = () => {
+interface RoleBasedDashboardProps {
+  forcedMode?: 'admin' | 'employee';
+}
+
+export const RoleBasedDashboard: React.FC<RoleBasedDashboardProps> = ({ forcedMode }) => {
   const { currentUser, employees, updateCurrentUser, switchUserRole, addToast } = useCRM();
 
   // Resolve native initial persona from current user attributes
@@ -52,6 +62,28 @@ export const RoleBasedDashboard: React.FC = () => {
     return (saved as DashboardPersona) || initialPersona;
   });
 
+  // Top-level Dashboard Mode: 'admin' vs 'employee'
+  const [dashboardMode, setDashboardMode] = useState<'admin' | 'employee'>(() => {
+    if (forcedMode) return forcedMode;
+    const saved = localStorage.getItem('scl_dashboard_view_mode');
+    if (saved === 'admin' || saved === 'employee') return saved;
+    if (currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'manager') {
+      return 'admin';
+    }
+    return 'employee';
+  });
+
+  // Keep in sync with forced mode or role changes
+  useEffect(() => {
+    if (forcedMode) {
+      setDashboardMode(forcedMode);
+    }
+  }, [forcedMode]);
+
+  useEffect(() => {
+    localStorage.setItem('scl_dashboard_view_mode', dashboardMode);
+  }, [dashboardMode]);
+
   // Automatically synchronize active persona whenever currentUser role or department changes
   useEffect(() => {
     setActivePersona(initialPersona);
@@ -59,7 +91,7 @@ export const RoleBasedDashboard: React.FC = () => {
 
   const [isCustomizing, setIsCustomizing] = useState(false);
 
-  // Per-persona layout preferences with localStorage caching & schema migration
+  // Per-persona layout preferences
   const [layouts, setLayouts] = useState<Record<DashboardPersona, WidgetId[]>>(() => {
     const saved = localStorage.getItem('scl_dashboard_layouts');
     if (saved) {
@@ -154,56 +186,137 @@ export const RoleBasedDashboard: React.FC = () => {
 
   const enabledWidgets = layouts[activePersona] || DEFAULT_LAYOUTS[activePersona];
 
-  // Render role-specific dashboard content
-  const renderDashboardView = () => {
+  // Render role-specific admin dashboard content
+  const renderAdminRoleView = () => {
     switch (activePersona) {
       case 'super_admin':
         return <SuperAdminDashboard enabledWidgets={enabledWidgets} />;
       case 'admin':
-        return <AdminDashboard enabledWidgets={enabledWidgets} />;
+        return (
+          <AdminDashboard 
+            enabledWidgets={enabledWidgets} 
+            onSwitchToEmployee={() => setDashboardMode('employee')} 
+          />
+        );
       case 'manager':
         return <ManagerDashboard enabledWidgets={enabledWidgets} />;
-      case 'sales_exec':
-        return <SalesExecutiveDashboard enabledWidgets={enabledWidgets} />;
       case 'sales_manager':
         return <SalesManagerDashboard enabledWidgets={enabledWidgets} />;
-      case 'developer':
-        return <DeveloperDashboard enabledWidgets={enabledWidgets} />;
-      case 'finance':
-        return <FinanceDashboard enabledWidgets={enabledWidgets} />;
       case 'hr':
         return <HRDashboard enabledWidgets={enabledWidgets} />;
-      case 'client':
-        return <ClientDashboard enabledWidgets={enabledWidgets} />;
       default:
-        return <DeveloperDashboard enabledWidgets={enabledWidgets} />;
+        return (
+          <AdminDashboard 
+            enabledWidgets={enabledWidgets} 
+            onSwitchToEmployee={() => setDashboardMode('employee')} 
+          />
+        );
     }
   };
 
+  if (currentUser.role === 'client') {
+    return (
+      <div className="p-4 sm:p-6 max-w-[1600px] mx-auto min-h-[calc(100vh-3.5rem)]">
+        <ClientDashboard enabledWidgets={enabledWidgets} />
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 sm:p-6 max-w-[1600px] mx-auto min-h-[calc(100vh-3.5rem)]">
-      {/* Role-Specific Header with Greeting, Telemetry & Persona Switcher */}
-      <DashboardHeader
-        persona={activePersona}
-        onSelectPersona={handleSelectPersona}
-        onOpenCustomizer={() => setIsCustomizing(true)}
-      />
+    <div className="p-4 sm:p-6 max-w-[1600px] mx-auto min-h-[calc(100vh-3.5rem)] space-y-6">
+      {/* SEPARATE DASHBOARD SELECTOR BANNER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-crm-card border border-crm-border p-2.5 rounded-xl shadow-sm">
+        <div className="flex items-center gap-2">
+          {/* Segmented Control */}
+          <div className="inline-flex p-1 bg-crm-surface rounded-lg border border-crm-border/80 shadow-inner">
+            <button
+              onClick={() => {
+                setDashboardMode('admin');
+                addToast({
+                  type: 'info',
+                  title: 'Admin Dashboard Activated',
+                  message: 'Viewing organization-wide telemetry, live workforce floor & approvals desk.'
+                });
+              }}
+              className={cn(
+                "flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all",
+                dashboardMode === 'admin'
+                  ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold shadow-md shadow-amber-500/20"
+                  : "text-crm-textMuted hover:text-crm-text hover:bg-crm-surfaceHover"
+              )}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>👑 Admin Dashboard</span>
+            </button>
 
-      {/* Role-Specific Priority Contextual Alerts */}
-      <RoleAlertsBanner persona={activePersona} />
+            <button
+              onClick={() => {
+                setDashboardMode('employee');
+                addToast({
+                  type: 'info',
+                  title: 'Employee Dashboard Activated',
+                  message: 'Viewing your personal shift clock, tasks, deliverables & leave quota.'
+                });
+              }}
+              className={cn(
+                "flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all",
+                dashboardMode === 'employee'
+                  ? "bg-turquoise text-slate-950 font-bold shadow-md shadow-turquoise/20"
+                  : "text-crm-textMuted hover:text-crm-text hover:bg-crm-surfaceHover"
+              )}
+            >
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>👤 Employee Dashboard</span>
+            </button>
+          </div>
 
-      {/* Dynamic Role Dashboard Layout */}
-      {renderDashboardView()}
+          <Badge 
+            variant={dashboardMode === 'admin' ? "warning" : "primary"}
+            className="text-[10px] hidden sm:inline-flex uppercase font-mono px-2 py-0.5"
+          >
+            {dashboardMode === 'admin' ? 'Managerial Clearance' : 'Staff Self-Service'}
+          </Badge>
+        </div>
 
-      {/* Dashboard Layout Customizer Modal */}
-      <CustomizeDashboardModal
-        isOpen={isCustomizing}
-        onClose={() => setIsCustomizing(false)}
-        persona={activePersona}
-        enabledWidgets={enabledWidgets}
-        onToggleWidget={handleToggleWidget}
-        onResetDefaults={handleResetDefaults}
-      />
+        <div className="flex items-center gap-3 text-xs text-crm-textMuted justify-between sm:justify-end">
+          <span className="hidden md:inline">Current View:</span>
+          <span className="font-semibold text-crm-text bg-crm-surface px-2.5 py-1 rounded border border-crm-border/60">
+            {dashboardMode === 'admin' ? 'Executive Operations & Attendance Approvals' : 'Personal Attendance, Tasks & Daily Standup'}
+          </span>
+        </div>
+      </div>
+
+      {/* DASHBOARD CONTENT DISPATCHER */}
+      {dashboardMode === 'employee' ? (
+        /* DEDICATED EMPLOYEE DASHBOARD */
+        <EmployeeDashboard onSwitchToAdmin={() => setDashboardMode('admin')} />
+      ) : (
+        /* DEDICATED ADMIN DASHBOARD */
+        <div>
+          {/* Admin Header with Persona Telemetry & Customizer */}
+          <DashboardHeader
+            persona={activePersona}
+            onSelectPersona={handleSelectPersona}
+            onOpenCustomizer={() => setIsCustomizing(true)}
+          />
+
+          {/* Contextual Alerts */}
+          <RoleAlertsBanner persona={activePersona} />
+
+          {/* Admin Role View */}
+          {renderAdminRoleView()}
+
+          {/* Layout Customizer */}
+          <CustomizeDashboardModal
+            isOpen={isCustomizing}
+            onClose={() => setIsCustomizing(false)}
+            persona={activePersona}
+            enabledWidgets={enabledWidgets}
+            onToggleWidget={handleToggleWidget}
+            onResetDefaults={handleResetDefaults}
+          />
+        </div>
+      )}
     </div>
   );
 };

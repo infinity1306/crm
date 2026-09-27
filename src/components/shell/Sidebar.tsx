@@ -148,8 +148,8 @@ export const Sidebar: React.FC = () => {
       allowedPersonas: ['super_admin', 'admin', 'hr', 'manager', 'developer', 'sales_exec', 'sales_manager', 'finance'],
       items: [
         { id: 'my-attendance', label: 'My Attendance & Clock', path: '/app/my-attendance', icon: Clock, isImplemented: true },
-        { id: 'attendance-desk', label: 'Attendance Dashboard', path: '/app/attendance', icon: CalendarClock, isImplemented: true },
-        { id: 'working-now', label: 'Working Now (Live Floor)', path: '/app/attendance/working-now', icon: UserCheck, isImplemented: true, badge: workingNowCount > 0 ? workingNowCount : undefined, badgeType: 'primary' },
+        { id: 'attendance-desk', label: 'Attendance Dashboard', path: '/app/attendance', icon: CalendarClock, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager'] },
+        { id: 'working-now', label: 'Working Now (Live Floor)', path: '/app/attendance/working-now', icon: UserCheck, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager'], badge: workingNowCount > 0 ? workingNowCount : undefined, badgeType: 'primary' },
         { id: 'leave', label: 'Leave Desk', path: '/app/leave', icon: Calendar, isImplemented: true, badge: pendingLeaveCount > 0 ? pendingLeaveCount : undefined, badgeType: 'warning' },
       ]
     },
@@ -333,26 +333,62 @@ export const Sidebar: React.FC = () => {
 
       {/* Main Navigation Tree */}
       <div className="flex-1 overflow-y-auto py-3 px-2 space-y-1 no-scrollbar text-xs">
-        {/* Top-Level Dashboard Item */}
-        <div className="mb-2">
+        {/* Top-Level Dashboard Links - Separate Admin & Employee */}
+        <div className="mb-2 space-y-1">
+          {/* Admin Dashboard button for managers and administrators */}
+          {(currentUser.role === 'admin' || currentUser.role === 'super_admin' || currentUser.role === 'manager') && (
+            <button
+              onClick={() => handleNavClick('/app/admin-dashboard')}
+              className={cn(
+                "w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium transition-all group relative text-xs",
+                (currentPath === '/app/admin-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') !== 'employee'))
+                  ? "bg-amber-500/10 text-amber-300 border border-amber-500/30 font-semibold"
+                  : "text-crm-textSecondary hover:text-crm-text hover:bg-crm-surface"
+              )}
+              title={isSidebarCollapsed ? "Admin Dashboard" : undefined}
+            >
+              <ShieldCheck className={cn(
+                "w-4 h-4 flex-shrink-0",
+                (currentPath === '/app/admin-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') !== 'employee'))
+                  ? "text-amber-400"
+                  : "text-crm-textMuted group-hover:text-crm-text"
+              )} />
+              {!isSidebarCollapsed && (
+                <div className="flex items-center justify-between flex-1 min-w-0">
+                  <span className="truncate">Admin Dashboard</span>
+                  <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">Ops</span>
+                </div>
+              )}
+              {(currentPath === '/app/admin-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') !== 'employee')) && (
+                <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-amber-400 rounded-r" />
+              )}
+            </button>
+          )}
+
+          {/* Employee Workspace button for staff & self-service */}
           <button
-            onClick={() => handleNavClick('/app/dashboard')}
+            onClick={() => handleNavClick('/app/employee-dashboard')}
             className={cn(
-              "w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium transition-all group relative",
-              (currentPath === '/app/overview' || currentPath === '/app/dashboard' || currentPath === '/app' || currentPath === '/')
+              "w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium transition-all group relative text-xs",
+              (currentPath === '/app/employee-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') === 'employee') || (currentUser.role === 'employee' && (currentPath === '/app' || currentPath === '/')))
                 ? "bg-turquoise-subtle text-turquoise border border-turquoise-subtleBorder font-semibold"
                 : "text-crm-textSecondary hover:text-crm-text hover:bg-crm-surface"
             )}
-            title={isSidebarCollapsed ? "Dashboard" : undefined}
+            title={isSidebarCollapsed ? "Employee Workspace" : undefined}
           >
-            <LayoutDashboard className={cn(
+            <UserCheck className={cn(
               "w-4 h-4 flex-shrink-0",
-              (currentPath === '/app/overview' || currentPath === '/app/dashboard' || currentPath === '/app' || currentPath === '/') ? "text-turquoise" : "text-crm-textMuted group-hover:text-crm-text"
+              (currentPath === '/app/employee-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') === 'employee') || (currentUser.role === 'employee' && (currentPath === '/app' || currentPath === '/')))
+                ? "text-turquoise"
+                : "text-crm-textMuted group-hover:text-crm-text"
             )} />
             {!isSidebarCollapsed && (
-              <span className="truncate">Dashboard</span>
+              <div className="flex items-center justify-between flex-1 min-w-0">
+                <span className="truncate">Employee Workspace</span>
+                <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-turquoise/20 text-turquoise font-mono">Self</span>
+              </div>
             )}
-            {(currentPath === '/app/overview' || currentPath === '/app/dashboard' || currentPath === '/app' || currentPath === '/') && (
+            {(currentPath === '/app/employee-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') === 'employee') || (currentUser.role === 'employee' && (currentPath === '/app' || currentPath === '/'))) && (
               <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-turquoise rounded-r" />
             )}
           </button>
