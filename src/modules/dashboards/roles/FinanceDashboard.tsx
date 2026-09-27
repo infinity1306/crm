@@ -33,7 +33,7 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({ enabledWidge
     { id: 'fin-out', label: 'Outstanding Receivables', value: `$${(financeMetrics.totalPending / 1000).toFixed(0)}k`, context: 'Active invoices', icon: Receipt, onClick: () => navigateTo('/app/finance/invoices') },
     { id: 'fin-overdue', label: 'Overdue Recovery', value: `$${(financeMetrics.totalOverdue / 1000).toFixed(0)}k`, context: `${financeMetrics.overdueInvoicesCount} overdue invoices`, isPositive: financeMetrics.overdueInvoicesCount === 0, icon: AlertTriangle, onClick: () => navigateTo('/app/finance/overdue') },
     { id: 'fin-exp', label: 'Total Expenses', value: `$${(financeMetrics.totalExpenses / 1000).toFixed(0)}k`, context: 'Approved claims', icon: Clock, onClick: () => navigateTo('/app/finance/expenses') },
-    { id: 'fin-net', label: 'Net Profit', value: `$${(financeMetrics.netRevenue / 1000).toFixed(0)}k`, change: `${financeMetrics.totalRevenue > 0 ? Math.round((financeMetrics.netRevenue / financeMetrics.totalRevenue) * 100) : 74}% margin`, isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/finance/reports') }
+    { id: 'fin-net', label: 'Net Profit', value: `$${(financeMetrics.netRevenue / 1000).toFixed(0)}k`, change: `${financeMetrics.totalRevenue > 0 ? Math.round((financeMetrics.netRevenue / financeMetrics.totalRevenue) * 100) : 0}% margin`, isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/finance/reports') }
   ];
 
   // Expenses breakdown
@@ -91,11 +91,11 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({ enabledWidge
               className="p-3 bg-blue-500/5 border border-blue-500/20 hover:border-blue-500/40 rounded cursor-pointer transition-colors"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="font-bold text-blue-400">Draft Invoices Pending Dispatch</span>
+                <span className="font-bold text-blue-400">Draft Invoices ({invoices.filter(i => i.status === 'draft').length})</span>
                 <Receipt className="w-3.5 h-3.5 text-blue-400" />
               </div>
               <p className="text-[11px] text-crm-textMuted">
-                2 client invoices drafted for milestone sign-offs awaiting dispatch.
+                {invoices.filter(i => i.status === 'draft').length} invoice(s) drafted awaiting commercial dispatch.
               </p>
             </div>
           </div>

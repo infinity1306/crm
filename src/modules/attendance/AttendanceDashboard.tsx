@@ -155,7 +155,7 @@ export const AttendanceDashboard: React.FC = () => {
 
       {/* SECTION 16 SPECIFICATION: TOP KPI METRICS FOR TODAY */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        {/* Present (e.g. 112 / 127) */}
+        {/* Present Metric */}
         <div className="p-3.5 rounded-xl bg-crm-card border border-crm-border">
           <div className="flex items-center justify-between text-slate-400 mb-1">
             <span className="text-[11px] font-mono uppercase tracking-wider font-semibold text-slate-400">Present</span>

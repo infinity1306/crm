@@ -17,9 +17,9 @@ import {
 export const ClientProjectPortalWidget: React.FC = () => {
   const { projects, invoices, tickets, calculateProjectProgress, navigateTo } = useCRM();
 
-  // Show the client's assigned project (e.g. Project Atlas or CRM Integration)
+  // Show the client's assigned project
   const clientProject = projects[0];
-  const progress = clientProject ? calculateProjectProgress(clientProject.id).overall : 74;
+  const progress = clientProject ? calculateProjectProgress(clientProject.id).overall : 0;
 
   const clientInvoices = invoices.slice(0, 3);
   const clientTickets = tickets.slice(0, 3);
@@ -37,8 +37,8 @@ export const ClientProjectPortalWidget: React.FC = () => {
           <div className="p-3 bg-crm-surface border border-crm-border/60 rounded-md">
             <div className="flex items-center justify-between gap-2 mb-2">
               <div>
-                <h4 className="text-xs font-bold text-crm-text">Current Phase: Phase 2 Core Integration</h4>
-                <p className="text-[11px] text-crm-textMuted">Target Completion: October 30, 2026</p>
+                <h4 className="text-xs font-bold text-crm-text">Current Phase: {clientProject ? ((clientProject.tags && clientProject.tags[0]) || "Active Workstream") : "Planning & Scoping"}</h4>
+                <p className="text-[11px] text-crm-textMuted">Target Completion: {clientProject?.deadline || "TBD"}</p>
               </div>
               <span className="text-sm font-bold font-mono text-turquoise">{progress}%</span>
             </div>
@@ -50,7 +50,7 @@ export const ClientProjectPortalWidget: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
               <div className="p-2 bg-crm-card/50 rounded border border-crm-border/40">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Lead Architect</span>
-                <p className="font-semibold text-crm-text mt-0.5">Siddharth Rao</p>
+                <p className="font-semibold text-crm-text mt-0.5">{clientProject?.managerName || "Star Chain Labs Lead"}</p>
               </div>
               <div className="p-2 bg-crm-card/50 rounded border border-crm-border/40">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Upcoming Checkpoint</span>
@@ -71,45 +71,29 @@ export const ClientProjectPortalWidget: React.FC = () => {
         subtitle="Shared deliverables verified by Star Chain Labs quality team"
       >
         <div className="space-y-2 text-xs">
-          <div className="p-2.5 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-              <div>
-                <p className="font-medium text-crm-text">Milestone 1: Architecture Specification & Database Schema</p>
-                <p className="text-[10px] text-crm-textMuted">Approved & Signed off on Aug 28, 2026</p>
-              </div>
+          {!clientProject ? (
+            <div className="py-6 text-center text-xs text-crm-textMuted">
+              No milestones currently registered.
             </div>
-            <Badge variant="success">Completed</Badge>
-          </div>
-
-          <div className="p-2.5 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-turquoise flex-shrink-0 animate-pulse" />
-              <div>
-                <p className="font-medium text-crm-text">Milestone 2: External API Gateway & Webhook Sync</p>
-                <p className="text-[10px] text-crm-textMuted">In Review · Ready for staging test</p>
+          ) : (
+            <div className="p-3 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-crm-text">Project Scope: {clientProject.name}</p>
+                  <p className="text-[10px] text-crm-textMuted">Status: {clientProject.status.toUpperCase()}</p>
+                </div>
               </div>
+              <Badge variant="success">{clientProject.status}</Badge>
             </div>
-            <Badge variant="warning">In Progress</Badge>
-          </div>
-
-          <div className="p-2.5 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-crm-textMuted flex-shrink-0" />
-              <div>
-                <p className="font-medium text-crm-text">Milestone 3: Final Security Penetration Report</p>
-                <p className="text-[10px] text-crm-textMuted">Scheduled for Oct 15, 2026</p>
-              </div>
-            </div>
-            <Badge variant="neutral">Upcoming</Badge>
-          </div>
+          )}
         </div>
       </WidgetContainer>
 
       {/* Client Billing & Invoices */}
       <WidgetContainer
         title="Invoices & Statements"
-        subtitle="Official tax invoices for ABC Technologies scope"
+        subtitle="Official tax invoices and billing statements"
         action={
           <button
             onClick={() => navigateTo('/app/finance/invoices')}
@@ -120,7 +104,11 @@ export const ClientProjectPortalWidget: React.FC = () => {
         }
       >
         <div className="space-y-2">
-          {clientInvoices.map(inv => (
+          {clientInvoices.length === 0 ? (
+            <div className="py-6 text-center text-xs text-crm-textMuted">
+              No commercial invoices issued yet.
+            </div>
+          ) : clientInvoices.map(inv => (
             <div
               key={inv.id}
               className="p-2.5 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between text-xs"

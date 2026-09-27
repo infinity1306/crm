@@ -37,25 +37,47 @@ export const SalesManagerDashboard: React.FC<SalesManagerDashboardProps> = ({ en
 
   const isEnabled = (id: WidgetId) => enabledWidgets.includes(id);
 
-  // Primary Sales Manager Metrics (7 cards as requested in Section 7)
-  const activePipelineVal = deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0) || 260000;
+  // Dynamic sales team metrics and reps data
+  const salesEmployees = employees.filter(e => e.department === 'Sales' || e.role === 'employee');
+  const repsData = salesEmployees.map(rep => {
+    const repLeads = leads.filter(l => l.ownerId === rep.id);
+    const repMeetings = meetings.filter(m => m.hostEmployeeId === rep.id || m.salesEmployeeId === rep.id);
+    const repFollowUps = followUps.filter(f => f.assignedToId === rep.id);
+    const repDeals = deals.filter(d => d.ownerId === rep.id);
+    const repWonDeals = repDeals.filter(d => d.stage === 'won');
+    const repProposals = repDeals.filter(d => d.stage === 'proposal');
+    const repRevenue = repWonDeals.reduce((s, d) => s + (d.value || 0), 0);
+
+    return {
+      id: rep.id,
+      name: rep.name,
+      role: rep.designation || 'Sales Representative',
+      leads: repLeads.length,
+      meetings: repMeetings.length,
+      followUps: repFollowUps.length,
+      qualified: repLeads.filter(l => l.stage === 'qualified').length,
+      proposals: repProposals.length,
+      won: repWonDeals.length,
+      revenue: repRevenue
+    };
+  });
+
+  const activePipelineVal = deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + (d.value || 0), 0);
+  const totalWonRevenue = deals.filter(d => d.stage === 'won').reduce((s, d) => s + (d.value || 0), 0);
+  const proposalsInPlay = deals.filter(d => d.stage === 'proposal').length;
+  const dealsWonCount = deals.filter(d => d.stage === 'won').length;
+
   const salesManagerMetrics: MetricItem[] = [
-    { id: 'team-leads', label: 'Team Inbound Leads', value: `${leads.length}`, change: '+12 this week', isPositive: true, icon: Users, onClick: () => navigateTo('/app/crm/leads') },
-    { id: 'team-meetings', label: 'Team Meetings', value: '32', context: '8 scheduled this week', icon: Calendar, onClick: () => navigateTo('/app/sales/meetings') },
-    { id: 'team-fu', label: 'Follow-ups Completed', value: '76', context: '14 due today', icon: Clock, onClick: () => navigateTo('/app/sales/activities') },
-    { id: 'team-proposals', label: 'Proposals In Play', value: '18', context: '$148k total ask', icon: FileText, onClick: () => navigateTo('/app/sales/pipeline') },
-    { id: 'team-conversions', label: 'Deals Won (Q3)', value: '7', change: '+2 vs last mo', isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/sales/pipeline') },
+    { id: 'team-leads', label: 'Team Inbound Leads', value: `${leads.length}`, change: `${leads.length > 0 ? '+100%' : '0'}`, isPositive: true, icon: Users, onClick: () => navigateTo('/app/crm/leads') },
+    { id: 'team-meetings', label: 'Team Meetings', value: `${meetings.length}`, context: 'Recorded client demos', icon: Calendar, onClick: () => navigateTo('/app/sales/meetings') },
+    { id: 'team-fu', label: 'Follow-ups Completed', value: `${followUps.length}`, context: 'Pipeline touchpoints', icon: Clock, onClick: () => navigateTo('/app/sales/activities') },
+    { id: 'team-proposals', label: 'Proposals In Play', value: `${proposalsInPlay}`, context: 'Active proposals', icon: FileText, onClick: () => navigateTo('/app/sales/pipeline') },
+    { id: 'team-conversions', label: 'Deals Won', value: `${dealsWonCount}`, change: `${dealsWonCount > 0 ? 'Active conversions' : 'Awaiting close'}`, isPositive: dealsWonCount > 0, icon: TrendingUp, onClick: () => navigateTo('/app/sales/pipeline') },
     { id: 'team-pipeline', label: 'Total Sales Pipeline', value: `$${(activePipelineVal / 1000).toFixed(0)}k`, context: `Across ${deals.length} deals`, icon: DollarSign, onClick: () => navigateTo('/app/sales/pipeline') },
-    { id: 'team-rev', label: 'Closed Team Revenue', value: `$142k`, context: 'Target: $200k (71%)', icon: Target, onClick: () => navigateTo('/app/sales/overview') }
+    { id: 'team-rev', label: 'Closed Team Revenue', value: `$${(totalWonRevenue / 1000).toFixed(0)}k`, context: 'Total settled revenue', icon: Target, onClick: () => navigateTo('/app/sales/overview') }
   ];
 
-  // Team Sales Table matching the prompt Section 7 format:
-  // Employee | Leads | Meetings | Follow-ups | Proposals | Conversions | Revenue
-  const repsData = [
-    { id: 'emp-2', name: 'Shivanshu Sharma', role: 'Sales Lead', leads: 28, meetings: 20, followUps: 46, qualified: 8, proposals: 5, won: 2, revenue: 68000 },
-    { id: 'emp-8', name: 'Ayesha Khan', role: 'Sr Account Exec', leads: 32, meetings: 18, followUps: 38, qualified: 10, proposals: 7, won: 3, revenue: 54000 },
-    { id: 'emp-13', name: 'Rajesh Gupta', role: 'Growth Lead', leads: 24, meetings: 12, followUps: 22, qualified: 6, proposals: 4, won: 2, revenue: 20000 }
-  ];
+  const stagnantDeals = deals.filter(d => d.stage === 'proposal' || d.stage === 'negotiation').slice(0, 3);
 
   return (
     <div className="space-y-6">
@@ -74,7 +96,7 @@ export const SalesManagerDashboard: React.FC<SalesManagerDashboardProps> = ({ en
         <WidgetContainer
           title="Team Sales Leaderboard & Activity Matrix"
           subtitle="Direct sales output per Account Executive"
-          badge="3 Reps Active"
+          badge={`${repsData.length} Reps Registered`}
           action={
             <button
               onClick={() => navigateTo('/app/sales/overview')}
@@ -84,48 +106,54 @@ export const SalesManagerDashboard: React.FC<SalesManagerDashboardProps> = ({ en
             </button>
           }
         >
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-crm-border/60 text-[10px] uppercase font-bold text-crm-textMuted tracking-wider">
-                  <th className="pb-2.5 font-semibold">Account Exec</th>
-                  <th className="pb-2.5 font-semibold text-center">Leads</th>
-                  <th className="pb-2.5 font-semibold text-center">Meetings</th>
-                  <th className="pb-2.5 font-semibold text-center">Follow-ups</th>
-                  <th className="pb-2.5 font-semibold text-center">Proposals</th>
-                  <th className="pb-2.5 font-semibold text-center">Conversions</th>
-                  <th className="pb-2.5 font-semibold text-right">Revenue Won</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-crm-border/30">
-                {repsData.map(rep => (
-                  <tr 
-                    key={rep.id}
-                    onClick={() => navigateTo(`/app/team/${rep.id}`)}
-                    className="hover:bg-crm-surfaceHover/60 cursor-pointer transition-colors"
-                  >
-                    <td className="py-2.5">
-                      <div className="flex items-center gap-2">
-                        <Avatar name={rep.name} size="sm" />
-                        <div>
-                          <p className="font-semibold text-crm-text truncate">{rep.name}</p>
-                          <p className="text-[10px] text-crm-textMuted">{rep.role}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-2.5 text-center font-mono text-crm-text">{rep.leads}</td>
-                    <td className="py-2.5 text-center font-mono text-crm-text">{rep.meetings}</td>
-                    <td className="py-2.5 text-center font-mono text-crm-text">{rep.followUps}</td>
-                    <td className="py-2.5 text-center font-mono text-turquoise">{rep.proposals}</td>
-                    <td className="py-2.5 text-center font-mono text-emerald-400 font-bold">{rep.won}</td>
-                    <td className="py-2.5 text-right font-mono font-bold text-emerald-400">
-                      ${(rep.revenue / 1000).toFixed(0)}k
-                    </td>
+          {repsData.length === 0 ? (
+            <div className="py-8 text-center text-xs text-crm-textMuted">
+              No sales representatives registered in the system.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-crm-border/60 text-[10px] uppercase font-bold text-crm-textMuted tracking-wider">
+                    <th className="pb-2.5 font-semibold">Account Exec</th>
+                    <th className="pb-2.5 font-semibold text-center">Leads</th>
+                    <th className="pb-2.5 font-semibold text-center">Meetings</th>
+                    <th className="pb-2.5 font-semibold text-center">Follow-ups</th>
+                    <th className="pb-2.5 font-semibold text-center">Proposals</th>
+                    <th className="pb-2.5 font-semibold text-center">Conversions</th>
+                    <th className="pb-2.5 font-semibold text-right">Revenue Won</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-crm-border/30">
+                  {repsData.map(rep => (
+                    <tr 
+                      key={rep.id}
+                      onClick={() => navigateTo(`/app/team/${rep.id}`)}
+                      className="hover:bg-crm-surfaceHover/60 cursor-pointer transition-colors"
+                    >
+                      <td className="py-2.5">
+                        <div className="flex items-center gap-2">
+                          <Avatar name={rep.name} size="sm" />
+                          <div>
+                            <p className="font-semibold text-crm-text truncate">{rep.name}</p>
+                            <p className="text-[10px] text-crm-textMuted">{rep.role}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-2.5 text-center font-mono text-crm-text">{rep.leads}</td>
+                      <td className="py-2.5 text-center font-mono text-crm-text">{rep.meetings}</td>
+                      <td className="py-2.5 text-center font-mono text-crm-text">{rep.followUps}</td>
+                      <td className="py-2.5 text-center font-mono text-turquoise">{rep.proposals}</td>
+                      <td className="py-2.5 text-center font-mono text-emerald-400 font-bold">{rep.won}</td>
+                      <td className="py-2.5 text-right font-mono font-bold text-emerald-400">
+                        ${(rep.revenue / 1000).toFixed(0)}k
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </WidgetContainer>
       )}
 
@@ -139,43 +167,29 @@ export const SalesManagerDashboard: React.FC<SalesManagerDashboardProps> = ({ en
           <WidgetContainer
             title="Pipeline Health & Stagnant Deals Warning"
             subtitle="Deals with zero recorded activity in >7 business days"
-            badge="3 Stagnant"
-            badgeType="warning"
+            badge={`${stagnantDeals.length} Flagged`}
+            badgeType={stagnantDeals.length > 0 ? "warning" : "neutral"}
           >
-            <div className="space-y-2 text-xs">
-              <div className="p-3 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-crm-text">Fintech Core Engine Demo</p>
-                  <p className="text-[10px] text-crm-textMuted">ABC Technologies · Rep: Shivanshu Sharma</p>
-                </div>
-                <div className="text-right">
-                  <span className="font-mono font-bold text-amber-400">$65,000</span>
-                  <p className="text-[10px] text-red-400">Stalled 11 days</p>
-                </div>
+            {stagnantDeals.length === 0 ? (
+              <div className="py-6 text-center text-xs text-crm-textMuted">
+                No stagnant deals detected. Sales pipeline is healthy.
               </div>
-
-              <div className="p-3 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-crm-text">Enterprise Analytics Platform</p>
-                  <p className="text-[10px] text-crm-textMuted">Krypton Systems · Rep: Ayesha Khan</p>
-                </div>
-                <div className="text-right">
-                  <span className="font-mono font-bold text-amber-400">$42,000</span>
-                  <p className="text-[10px] text-red-400">Stalled 8 days</p>
-                </div>
+            ) : (
+              <div className="space-y-2 text-xs">
+                {stagnantDeals.map(deal => (
+                  <div key={deal.id} className="p-3 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-crm-text">{deal.name}</p>
+                      <p className="text-[10px] text-crm-textMuted">{deal.companyName || 'Enterprise Account'}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-mono font-bold text-amber-400">${(deal.value || 0).toLocaleString()}</span>
+                      <p className="text-[10px] text-red-400">{deal.stage.toUpperCase()}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="p-3 bg-crm-surface border border-crm-border/60 rounded flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-crm-text">Security Smart Contract Audit</p>
-                  <p className="text-[10px] text-crm-textMuted">Vertex Labs · Rep: Rajesh Gupta</p>
-                </div>
-                <div className="text-right">
-                  <span className="font-mono font-bold text-amber-400">$28,000</span>
-                  <p className="text-[10px] text-red-400">Stalled 14 days</p>
-                </div>
-              </div>
-            </div>
+            )}
           </WidgetContainer>
         )}
       </div>

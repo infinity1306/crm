@@ -37,20 +37,27 @@ export const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = (
 
   const isEnabled = (id: WidgetId) => enabledWidgets.includes(id);
 
+  const myLeads = leads.filter(l => l.ownerId === currentUser.id || !l.ownerId);
   const myDeals = deals.filter(d => d.ownerId === currentUser.id);
-  const myPipelineValue = myDeals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0) || 120000;
-  const myWonRevenue = myDeals.filter(d => d.stage === 'won').reduce((s, d) => s + d.value, 0) || 45000;
+  const myMeetings = meetings.filter(m => m.hostEmployeeId === currentUser.id || m.salesEmployeeId === currentUser.id);
+  const myFollowUps = followUps.filter(f => f.assignedToId === currentUser.id);
+  const myPipelineValue = myDeals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0);
+  const myWonRevenue = myDeals.filter(d => d.stage === 'won').reduce((s, d) => s + d.value, 0);
+  const myProposals = myDeals.filter(d => d.stage === 'proposal');
+  const myConversions = myDeals.filter(d => d.stage === 'won');
 
   // Primary Sales Metrics (8 cards as requested in Section 6)
+  const qualifiedCount = myLeads.filter(l => l.stage === 'qualified').length;
+  const qualRate = myLeads.length > 0 ? Math.round((qualifiedCount / myLeads.length) * 100) : 0;
   const salesMetrics: MetricItem[] = [
-    { id: 'my-leads', label: 'My Leads', value: '28', change: '+3 today', isPositive: true, icon: Users, onClick: () => navigateTo('/app/crm/leads') },
-    { id: 'qualified', label: 'Qualified Leads', value: '12', change: '43% rate', isPositive: true, icon: Target, onClick: () => navigateTo('/app/crm/leads') },
-    { id: 'meetings-count', label: 'Meetings Booked', value: '6', context: '4 scheduled today', icon: Calendar, onClick: () => navigateTo('/app/sales/meetings') },
-    { id: 'follow-ups-count', label: 'Follow-ups Queued', value: '15', context: '3 overdue', isPositive: false, icon: Clock, onClick: () => navigateTo('/app/sales/activities') },
-    { id: 'proposals', label: 'Sent Proposals', value: '5', context: '$62k total value', icon: FileText, onClick: () => navigateTo('/app/sales/pipeline') },
-    { id: 'conversions', label: 'Conversions (Won)', value: '3', change: '+1 this week', isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/sales/pipeline') },
+    { id: 'my-leads', label: 'My Leads', value: `${myLeads.length}`, change: `${myLeads.length > 0 ? '+100%' : '0'}`, isPositive: true, icon: Users, onClick: () => navigateTo('/app/crm/leads') },
+    { id: 'qualified', label: 'Qualified Leads', value: `${qualifiedCount}`, change: `${qualRate}% rate`, isPositive: true, icon: Target, onClick: () => navigateTo('/app/crm/leads') },
+    { id: 'meetings-count', label: 'Meetings Booked', value: `${myMeetings.length}`, context: 'Recorded client syncs', icon: Calendar, onClick: () => navigateTo('/app/sales/meetings') },
+    { id: 'follow-ups-count', label: 'Follow-ups Queued', value: `${myFollowUps.length}`, context: 'Pending touchpoints', isPositive: myFollowUps.length === 0, icon: Clock, onClick: () => navigateTo('/app/sales/activities') },
+    { id: 'proposals', label: 'Sent Proposals', value: `${myProposals.length}`, context: `$${(myProposals.reduce((s, d) => s + d.value, 0) / 1000).toFixed(0)}k total value`, icon: FileText, onClick: () => navigateTo('/app/sales/pipeline') },
+    { id: 'conversions', label: 'Conversions (Won)', value: `${myConversions.length}`, change: `${myConversions.length > 0 ? 'Active conversion' : 'In pipeline'}`, isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/sales/pipeline') },
     { id: 'pipeline-value', label: 'My Pipeline Value', value: `$${(myPipelineValue / 1000).toFixed(0)}k`, context: 'Active negotiations', icon: DollarSign, onClick: () => navigateTo('/app/sales/pipeline') },
-    { id: 'revenue-actual', label: 'Closed Revenue', value: `$${(myWonRevenue / 1000).toFixed(0)}k`, context: 'Target: $60k', icon: CheckCircle2, onClick: () => navigateTo('/app/sales/overview') }
+    { id: 'revenue-actual', label: 'Closed Revenue', value: `$${(myWonRevenue / 1000).toFixed(0)}k`, context: 'Won revenue', icon: CheckCircle2, onClick: () => navigateTo('/app/sales/overview') }
   ];
 
   const todayMeetings = meetings.filter(m => m.date === '2026-09-21' || m.status === 'scheduled').slice(0, 3);
@@ -58,11 +65,11 @@ export const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = (
 
   // Performance Target vs Actual comparison
   const targets = [
-    { label: 'Meetings Held', target: 20, actual: 16, unit: '' },
-    { label: 'Qualified Leads', target: 15, actual: 12, unit: '' },
-    { label: 'Proposals Submitted', target: 8, actual: 5, unit: '' },
-    { label: 'Deals Won', target: 4, actual: 3, unit: '' },
-    { label: 'Revenue Quota', target: 60000, actual: myWonRevenue, unit: '$' }
+    { label: 'Meetings Held', target: 10, actual: myMeetings.length, unit: '' },
+    { label: 'Qualified Leads', target: 10, actual: qualifiedCount, unit: '' },
+    { label: 'Proposals Submitted', target: 5, actual: myProposals.length, unit: '' },
+    { label: 'Deals Won', target: 3, actual: myConversions.length, unit: '' },
+    { label: 'Revenue Quota', target: 50000, actual: myWonRevenue, unit: '$' }
   ];
 
   return (
@@ -96,7 +103,9 @@ export const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = (
             }
           >
             <div className="space-y-2">
-              {todayMeetings.map(m => (
+              {todayMeetings.length === 0 ? (
+                <div className="py-6 text-center text-xs text-crm-textMuted">No meetings scheduled for today.</div>
+              ) : todayMeetings.map(m => (
                 <div 
                   key={m.id}
                   onClick={() => navigateTo('/app/sales/meetings')}
@@ -131,7 +140,9 @@ export const SalesExecutiveDashboard: React.FC<SalesExecutiveDashboardProps> = (
             }
           >
             <div className="space-y-2">
-              {todayFollowUps.map(f => (
+              {todayFollowUps.length === 0 ? (
+                <div className="py-6 text-center text-xs text-crm-textMuted">No pending follow-ups in queue.</div>
+              ) : todayFollowUps.map(f => (
                 <div 
                   key={f.id}
                   onClick={() => navigateTo('/app/sales/activities')}

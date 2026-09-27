@@ -23,7 +23,8 @@ export const DailyUpdateWidget: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Check if today's update is already submitted
-  const todayUpdate = workUpdates.find(u => u.employeeId === currentUser.id && u.date === '2026-09-21');
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const todayUpdate = workUpdates.find(u => u.employeeId === currentUser.id && (u.date === todayDateStr || u.date === '2026-09-27'));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,14 +40,14 @@ export const DailyUpdateWidget: React.FC = () => {
       employeeName: currentUser.name,
       employeeAvatar: currentUser.avatar,
       employeeDesignation: currentUser.designation || currentUser.role,
-      projectId: proj?.id || 'p-1',
-      projectName: proj?.name || 'Project Atlas',
+      projectId: proj?.id || '',
+      projectName: proj?.name || 'General Operations',
       completedItems: completed ? [completed] : ['Completed assigned subtasks'],
       inProgressItems: inProgress ? [inProgress] : ['Ongoing sprint task'],
       blockedItems: blockers ? [blockers] : [],
       nextActionItems: next ? [next] : ['Continue sprint pipeline'],
       hoursSpent: 7.5,
-      date: '2026-09-21'
+      date: todayDateStr
     });
 
     setIsSubmitted(true);
@@ -75,8 +76,8 @@ export const DailyUpdateWidget: React.FC = () => {
             <span>You have already submitted your daily update for today!</span>
           </div>
           <div className="text-[11px] text-crm-textMuted pl-6 space-y-1">
-            <p><strong>Project:</strong> {todayUpdate?.projectName || 'Project Atlas'}</p>
-            <p><strong>Completed:</strong> {todayUpdate?.completedItems?.join(', ') || completed || 'Refactored API endpoint'}</p>
+            <p><strong>Project:</strong> {todayUpdate?.projectName || 'General Operations'}</p>
+            <p><strong>Completed:</strong> {todayUpdate?.completedItems?.join(', ') || completed || 'Daily milestones'}</p>
             {todayUpdate?.blockedItems?.length ? (
               <p className="text-amber-400"><strong>Blockers:</strong> {todayUpdate.blockedItems.join(', ')}</p>
             ) : null}

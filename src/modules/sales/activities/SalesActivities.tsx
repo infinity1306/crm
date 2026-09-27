@@ -31,87 +31,10 @@ export const SalesActivities: React.FC = () => {
   const [repFilter, setRepFilter] = useState('all');
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
-  // Mock comprehensive sales activity stream
-  const [activities] = useState<CRMActivity[]>([
-    {
-      id: 'act-1',
-      type: 'call',
-      clientId: 'lead-1',
-      clientName: 'Vikram Malhotra',
-      companyId: 'comp-1',
-      employeeId: 'emp-1',
-      employeeName: 'Aarav Sharma',
-      date: '2026-09-20',
-      time: '02:30 PM',
-      duration: '22 mins',
-      outcome: 'Technical discovery completed; confirmed requirement for L1 validator nodes and multi-sig security.',
-      nextAction: 'Send technical architecture proposal & SLA tier breakdown.',
-      nextFollowUp: '2026-09-23',
-      notes: 'CTO Vikram expressed high interest in Indian data residency compliance.'
-    },
-    {
-      id: 'act-2',
-      type: 'meeting',
-      clientId: 'lead-2',
-      clientName: 'Priya Iyer',
-      companyId: 'comp-2',
-      employeeId: 'emp-2',
-      employeeName: 'Rohan Mehta',
-      date: '2026-09-19',
-      time: '11:00 AM',
-      duration: '45 mins',
-      outcome: 'Presented custom distributed ledger capabilities. Executive stakeholders satisfied with throughput benchmarks.',
-      nextAction: 'Finalize revised commercial quote for ₹4,80,000.',
-      nextFollowUp: '2026-09-22',
-      notes: 'Meeting held online via Google Meet. CFO joined for commercial session.'
-    },
-    {
-      id: 'act-3',
-      type: 'email',
-      clientId: 'lead-3',
-      clientName: 'Kabir Sengupta',
-      companyId: 'comp-3',
-      employeeId: 'emp-4',
-      employeeName: 'Neha Patel',
-      date: '2026-09-18',
-      time: '04:15 PM',
-      duration: '10 mins',
-      outcome: 'Dispatched Master Services Agreement (MSA) and Statement of Work (SOW).',
-      nextAction: 'Follow up regarding legal review and countersignature.',
-      nextFollowUp: '2026-09-21',
-      notes: 'Legal counsel is reviewing clause 8.4 IP rights.'
-    },
-    {
-      id: 'act-4',
-      type: 'call',
-      clientId: 'lead-4',
-      clientName: 'Ananya Deshmukh',
-      companyId: 'comp-4',
-      employeeId: 'emp-1',
-      employeeName: 'Aarav Sharma',
-      date: '2026-09-17',
-      time: '10:30 AM',
-      duration: '15 mins',
-      outcome: 'Discovery checkpoint: Clarified expected monthly active volume for automated smart contract micro-billing.',
-      nextAction: 'Schedule live sandbox demo with lead engineering team.',
-      nextFollowUp: '2026-09-22',
-      notes: 'Client requested API documentation access.'
-    },
-    {
-      id: 'act-5',
-      type: 'note',
-      clientId: 'lead-5',
-      clientName: 'Rajesh Nambiar',
-      companyId: 'comp-5',
-      employeeId: 'emp-2',
-      employeeName: 'Rohan Mehta',
-      date: '2026-09-16',
-      time: '06:00 PM',
-      duration: '5 mins',
-      outcome: 'Internal account audit completed. Deal probability adjusted to 75% following board budget sanction.',
-      notes: 'CEO approved allocation for Web3 security pilot program.'
-    }
-  ]);
+  const [activities, setActivities] = useState<CRMActivity[]>(() => {
+    const saved = localStorage.getItem('scl_sales_activities');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const filteredActivities = useMemo(() => {
     return activities.filter(act => {
@@ -166,7 +89,7 @@ export const SalesActivities: React.FC = () => {
         <div className="p-3.5 rounded-lg bg-crm-card border border-crm-border flex items-center justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-crm-textMuted font-medium">Logged Activities</div>
-            <div className="text-xl font-bold text-crm-text mt-0.5">38</div>
+            <div className="text-xl font-bold text-crm-text mt-0.5">{activities.length}</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-crm-surface border border-crm-border flex items-center justify-center text-crm-textMuted">
             <History className="w-4 h-4" />
@@ -176,7 +99,7 @@ export const SalesActivities: React.FC = () => {
         <div className="p-3.5 rounded-lg bg-crm-card border border-crm-border flex items-center justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-crm-textMuted font-medium">Calls Completed</div>
-            <div className="text-xl font-bold text-blue-400 mt-0.5">24</div>
+            <div className="text-xl font-bold text-blue-400 mt-0.5">{activities.filter(a => a.type === "call").length}</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
             <Phone className="w-4 h-4" />
@@ -186,7 +109,7 @@ export const SalesActivities: React.FC = () => {
         <div className="p-3.5 rounded-lg bg-crm-card border border-crm-border flex items-center justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-crm-textMuted font-medium">Syncs & Meetings</div>
-            <div className="text-xl font-bold text-turquoise mt-0.5">11</div>
+            <div className="text-xl font-bold text-turquoise mt-0.5">{activities.filter(a => a.type === "meeting").length}</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-turquoise/10 border border-turquoise/20 flex items-center justify-center text-turquoise">
             <Calendar className="w-4 h-4" />
@@ -196,7 +119,7 @@ export const SalesActivities: React.FC = () => {
         <div className="p-3.5 rounded-lg bg-crm-card border border-crm-border flex items-center justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-crm-textMuted font-medium">Follow-ups Scheduled</div>
-            <div className="text-xl font-bold text-emerald-400 mt-0.5">14</div>
+            <div className="text-xl font-bold text-emerald-400 mt-0.5">{activities.filter(a => !!a.nextFollowUp).length}</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
             <CheckSquare className="w-4 h-4" />
@@ -244,8 +167,26 @@ export const SalesActivities: React.FC = () => {
       </div>
 
       {/* Activity Timeline Feed */}
-      <div className="space-y-3">
-        {filteredActivities.map(activity => (
+      {filteredActivities.length === 0 ? (
+        <div className="p-12 text-center bg-crm-card border border-crm-border rounded-lg">
+          <History className="w-10 h-10 text-crm-textMuted mx-auto mb-3 opacity-40" />
+          <h3 className="text-sm font-semibold text-crm-text">No Sales Activities Found</h3>
+          <p className="text-xs text-crm-textSecondary mt-1 max-w-sm mx-auto">
+            Log client calls, discovery sessions, and follow-ups to track sales momentum.
+          </p>
+          <Button
+            variant="primary"
+            size="sm"
+            className="mt-4"
+            icon={<Plus className="w-3.5 h-3.5" />}
+            onClick={() => setIsLogModalOpen(true)}
+          >
+            Log First Activity
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredActivities.map(activity => (
           <div
             key={activity.id}
             className="p-4 rounded-lg bg-crm-card border border-crm-border hover:border-turquoise/40 transition-colors space-y-3 text-xs"
@@ -298,7 +239,8 @@ export const SalesActivities: React.FC = () => {
             )}
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       <LogActivityModal
         isOpen={isLogModalOpen}

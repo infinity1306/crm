@@ -26,6 +26,7 @@ interface ClientDashboardProps {
 export const ClientDashboard: React.FC<ClientDashboardProps> = ({ enabledWidgets }) => {
   const { 
     currentUser, 
+    projects,
     tickets, 
     invoices, 
     createTicket, 
@@ -43,16 +44,17 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({ enabledWidgets
     e.preventDefault();
     if (!ticketSubject.trim()) return;
 
+    const activeProj = projects[0];
     createTicket({
       title: ticketSubject,
       description: ticketDetails || 'Client submitted request from portal',
-      projectId: 'p-1',
-      projectName: 'Project Atlas',
+      projectId: activeProj?.id || '',
+      projectName: activeProj?.name || 'Client Project Scope',
       priority: 'medium',
       type: 'client_issue',
       status: 'open',
-      assignedToId: 'emp-3',
-      assignedToName: 'Siddharth Rao',
+      assignedToId: activeProj?.managerId || '',
+      assignedToName: activeProj?.managerName || 'Project Lead',
       createdBy: currentUser.id,
       createdByName: currentUser.name
     });
@@ -73,7 +75,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({ enabledWidgets
     addToast({
       type: 'success',
       title: 'Message Sent',
-      message: 'Your project lead Siddharth Rao has been notified.'
+      message: 'Your dedicated project lead has been notified.'
     });
     setClientMessage('');
   };
@@ -87,7 +89,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({ enabledWidgets
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-crm-text">ABC Technologies Client Workspace</h2>
+            <h2 className="text-sm font-bold text-crm-text">{(currentUser as any).company || "Enterprise"} Client Workspace</h2>
             <p className="text-[11px] text-crm-textMuted">
               Dedicated client portal powered by Star Chain Labs. Enterprise SLA Active.
             </p>
@@ -141,17 +143,11 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({ enabledWidgets
         {/* Message Project Lead */}
         <WidgetContainer
           title="Message Project Team"
-          subtitle="Direct line to Siddharth Rao (Lead Architect)"
+          subtitle={`Direct line to ${projects[0]?.managerName ? projects[0].managerName + " (Project Lead)" : "Dedicated Project Leadership"}`}
         >
           <div className="space-y-3 text-xs">
-            <div className="p-3 bg-crm-surface border border-crm-border/60 rounded space-y-2">
-              <div className="flex items-center justify-between text-[10px] text-crm-textMuted">
-                <span className="font-semibold text-turquoise">Siddharth Rao (Star Chain Labs)</span>
-                <span>10:45 AM Today</span>
-              </div>
-              <p className="text-[11px] text-crm-text">
-                "Hi Rajesh, we have finalized the webhook retry contracts. The staging sandbox has been updated for your team."
-              </p>
+            <div className="p-3 bg-crm-surface border border-crm-border/60 rounded text-center text-xs text-crm-textMuted py-4">
+              Direct channel active. Send a message to your assigned Star Chain Labs engineering lead below.
             </div>
 
             <form onSubmit={handleSendMessage} className="space-y-2">

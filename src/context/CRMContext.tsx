@@ -344,7 +344,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'scl_attendance_records', 'scl_leave_requests', 'scl_correction_requests',
         'scl_exceptions', 'scl_invoices', 'scl_payments', 'scl_expenses',
         'scl_employees', 'scl_notifications', 'scl_activity_events', 'scl_audit_logs',
-        'scl_invitations', 'scl_current_user', 'scl_notes', 'scl_documents', 'scl_sessions'
+        'scl_invitations', 'scl_current_user', 'scl_notes', 'scl_documents', 'scl_sessions', 'scl_sales_activities'
       ];
       demoKeys.forEach(k => localStorage.removeItem(k));
       localStorage.setItem('scl_cache_version', PROD_CACHE_VERSION);

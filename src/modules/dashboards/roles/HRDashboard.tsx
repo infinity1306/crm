@@ -33,19 +33,24 @@ export const HRDashboard: React.FC<HRDashboardProps> = ({ enabledWidgets }) => {
 
   const isEnabled = (id: WidgetId) => enabledWidgets.includes(id);
 
-  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
-  const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length || 118;
-  const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length || 84;
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const todayRecords = attendanceRecords.filter(r => (r.date === todayDateStr || r.date === '2026-09-27'));
+  const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length;
+  const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length;
+  const lateCount = todayRecords.filter(r => r.status === 'late' || r.lateMinutes > 0).length;
+  const leaveTodayCount = todayRecords.filter(r => r.status === 'leave').length;
   const pendingLeaves = leaveRequests.filter(l => l.status === 'pending');
+  const unplannedAbsent = Math.max(0, employees.length - presentCount - leaveTodayCount);
 
   // 6 Primary HR Metrics (Section 10)
+  const attendanceRate = employees.length > 0 ? Math.round((presentCount / employees.length) * 100) : 0;
   const hrMetrics: MetricItem[] = [
-    { id: 'hr-total', label: 'Total Headcount', value: '127', change: '+6 this month', isPositive: true, icon: Users, onClick: () => navigateTo('/app/team') },
-    { id: 'hr-present', label: 'Present Today', value: `${presentCount}`, context: '96% on duty', icon: UserCheck, onClick: () => navigateTo('/app/attendance') },
+    { id: 'hr-total', label: 'Total Headcount', value: `${employees.length}`, change: `${employees.length} active`, isPositive: true, icon: Users, onClick: () => navigateTo('/app/team') },
+    { id: 'hr-present', label: 'Present Today', value: `${presentCount}`, context: `${attendanceRate}% on duty`, icon: UserCheck, onClick: () => navigateTo('/app/attendance') },
     { id: 'hr-working', label: 'Working Now', value: `${workingNowCount}`, context: 'Active live desks', icon: Clock, onClick: () => navigateTo('/app/attendance/working-now') },
-    { id: 'hr-late', label: 'Late Arrivals', value: '3', context: 'Grace period used', icon: AlertTriangle, isPositive: false, onClick: () => navigateTo('/app/attendance') },
-    { id: 'hr-leave', label: 'On Approved Leave', value: '4', context: 'Scheduled PTO/Sick', icon: Calendar, onClick: () => navigateTo('/app/leave') },
-    { id: 'hr-absent', label: 'Unplanned Absent', value: '1', context: 'Requires contact', isPositive: false, icon: AlertTriangle, onClick: () => navigateTo('/app/attendance') }
+    { id: 'hr-late', label: 'Late Arrivals', value: `${lateCount}`, context: 'Grace period used', icon: AlertTriangle, isPositive: lateCount === 0, onClick: () => navigateTo('/app/attendance') },
+    { id: 'hr-leave', label: 'On Approved Leave', value: `${leaveTodayCount}`, context: 'Scheduled PTO/Sick', icon: Calendar, onClick: () => navigateTo('/app/leave') },
+    { id: 'hr-absent', label: 'Unplanned Absent', value: `${unplannedAbsent}`, context: unplannedAbsent > 0 ? 'Requires contact' : 'Full attendance', isPositive: unplannedAbsent === 0, icon: AlertTriangle, onClick: () => navigateTo('/app/attendance') }
   ];
 
   const recentEmployees = employees.slice(0, 5);
@@ -201,30 +206,38 @@ export const HRDashboard: React.FC<HRDashboardProps> = ({ enabledWidgets }) => {
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-crm-text">Average Daily Working Hours</span>
-                  <span className="font-mono font-bold text-turquoise">7.8 hrs</span>
+                  <span className="font-mono font-bold text-turquoise">
+                    {attendanceRecords.filter(r => r.totalWorkingMinutes > 0).length > 0 
+                      ? ((attendanceRecords.filter(r => r.totalWorkingMinutes > 0).reduce((s, r) => s + r.totalWorkingMinutes, 0) / attendanceRecords.filter(r => r.totalWorkingMinutes > 0).length) / 60).toFixed(1) 
+                      : '0.0'} hrs
+                  </span>
                 </div>
                 <div className="w-full h-1.5 bg-crm-card rounded-full overflow-hidden">
-                  <div className="h-full bg-turquoise" style={{ width: '92%' }} />
+                  <div className="h-full bg-turquoise" style={{ width: `${Math.min(100, Math.round((presentCount / Math.max(1, employees.length)) * 100))}%` }} />
                 </div>
               </div>
 
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-crm-text">On-Time Arrival Rate</span>
-                  <span className="font-mono font-bold text-emerald-400">97.6%</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    {presentCount > 0 ? Math.round(((presentCount - lateCount) / presentCount) * 100) : 100}%
+                  </span>
                 </div>
                 <div className="w-full h-1.5 bg-crm-card rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-400" style={{ width: '97%' }} />
+                  <div className="h-full bg-emerald-400" style={{ width: `${presentCount > 0 ? Math.round(((presentCount - lateCount) / presentCount) * 100) : 100}%` }} />
                 </div>
               </div>
 
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-crm-text">Leave Utilization (Q3)</span>
-                  <span className="font-mono font-bold text-amber-400">42% Allocated</span>
+                  <span className="font-medium text-crm-text">Leave Utilization</span>
+                  <span className="font-mono font-bold text-amber-400">
+                    {leaveRequests.filter(l => l.status === 'approved').length} Approved
+                  </span>
                 </div>
                 <div className="w-full h-1.5 bg-crm-card rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-400" style={{ width: '42%' }} />
+                  <div className="h-full bg-amber-400" style={{ width: `${Math.min(100, leaveRequests.filter(l => l.status === 'approved').length * 10)}%` }} />
                 </div>
               </div>
             </div>

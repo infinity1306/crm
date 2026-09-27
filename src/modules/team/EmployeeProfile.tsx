@@ -74,7 +74,7 @@ export const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employeeId }) 
   });
 
   const employeeNotes = notes.filter(n => n.employeeId === employee.id);
-  const employeeDocs = documents.filter(d => d.employeeId === employee.id || d.employeeId === 'emp-1');
+  const employeeDocs = documents.filter(d => d.employeeId === employee.id);
   const employeeActivities = activityEvents.filter(a => a.actorId === employee.id || a.entityId === employee.id);
   const employeeProjects = projects.filter(p => p.managerId === employee.id || (p.teamIds && p.teamIds.includes(employee.id)));
   const employeeTasks = tasks.filter(t => t.assigneeId === employee.id);

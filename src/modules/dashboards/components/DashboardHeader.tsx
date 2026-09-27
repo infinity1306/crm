@@ -32,7 +32,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onOpenCustomizer
 }) => {
   const { 
-    currentUser, 
+    currentUser,
+    employees, 
     meetings, 
     followUps, 
     leads, 
@@ -87,7 +88,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <span>·</span>
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5 text-crm-textMuted" />
-              Monday, Sep 21, 2026
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
             <span>·</span>
             <span className="inline-flex items-center gap-1 text-emerald-400">
@@ -102,9 +103,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <div className="flex items-center gap-3 text-xs text-crm-textMuted flex-wrap">
             <span className="text-crm-text">Operations & Infrastructure Desk</span>
             <span>·</span>
-            <span>Sep 21, 2026</span>
+            <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             <span>·</span>
-            <span className="text-turquoise">127 Total Employees</span>
+            <span className="text-turquoise">{employees.length} Total Employees</span>
           </div>
         );
 
@@ -145,19 +146,20 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         );
 
       case 'developer':
-        const myRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && (r.date === '2026-09-27' || r.date === '2026-09-21'));
-        const isWorking = myRecord ? (myRecord.status === 'present' || myRecord.status === 'working') : true;
-        const punchIn = myRecord?.punchIn || '09:14 AM';
+        const todayHeaderDate = new Date().toISOString().split('T')[0];
+        const myRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && (r.date === todayHeaderDate || r.date === '2026-09-27'));
+        const isWorking = myRecord ? (myRecord.status === 'present' || myRecord.status === 'working') : false;
+        const punchIn = myRecord?.punchIn || (isWorking ? '09:00 AM' : 'Not Clocked In');
         return (
           <div className="flex items-center gap-3 text-xs text-crm-textMuted flex-wrap">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <strong className="text-crm-text">Current Status:</strong> {isWorking ? 'Working' : 'Idle'}
+              <span className={`w-2 h-2 rounded-full ${isWorking ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+              <strong className="text-crm-text">Current Status:</strong> {isWorking ? 'Working' : 'Shift Not Started'}
             </span>
             <span>·</span>
             <span><strong className="text-crm-text">Punch In:</strong> {punchIn}</span>
             <span>·</span>
-            <span className="text-turquoise"><strong className="text-crm-text">Elapsed:</strong> 06h 22m</span>
+            <span className="text-turquoise"><strong className="text-crm-text">Active Shift:</strong> {isWorking ? `${myRecord?.totalWorkingMinutes ? (myRecord.totalWorkingMinutes / 60).toFixed(1) + 'h' : 'In Session'}` : '--'}</span>
           </div>
         );
 

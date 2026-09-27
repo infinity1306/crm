@@ -35,34 +35,38 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({ enabledW
   const isEnabled = (id: WidgetId) => enabledWidgets.includes(id);
 
   const myTasks = tasks.filter(t => t.assigneeId === currentUser.id);
-  const myTasksDueToday = myTasks.filter(t => t.deadline === '2026-09-21' && t.status !== 'done').length;
-  const myOverdueTasks = myTasks.filter(t => t.status !== 'done' && t.deadline && t.deadline < '2026-09-21').length;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const myTasksDueToday = myTasks.filter(t => t.deadline === todayStr && t.status !== 'done').length;
+  const myOverdueTasks = myTasks.filter(t => t.status !== 'done' && t.deadline && t.deadline < todayStr).length;
   const myBlockedTasks = myTasks.filter(t => t.status === 'blocked').length;
   const myTickets = tickets.filter(t => t.assignedToId === currentUser.id);
 
   // 5 My Work Summary Metric Cards (Section 8)
   const workSummaryMetrics: MetricItem[] = [
-    { id: 'dev-proj', label: 'My Projects', value: '2', context: 'Sprint 38 active', icon: FolderKanban, onClick: () => navigateTo('/app/projects') },
+    { id: 'dev-proj', label: 'My Projects', value: `${projects.filter(p => p.teamIds?.includes(currentUser.id) || p.managerId === currentUser.id).length}`, context: 'Assigned workstreams', icon: FolderKanban, onClick: () => navigateTo('/app/projects') },
     { id: 'dev-tasks', label: 'Active Tasks', value: `${myTasks.filter(t => t.status !== 'done').length}`, context: 'Sprint commitments', icon: CheckSquare, onClick: () => navigateTo('/app/tasks') },
-    { id: 'dev-today', label: 'Tasks Due Today', value: `${myTasksDueToday || 2}`, context: 'Priority focus', isPositive: true, icon: Clock, onClick: () => navigateTo('/app/tasks') },
+    { id: 'dev-today', label: 'Tasks Due Today', value: `${myTasksDueToday}`, context: 'Priority focus', isPositive: true, icon: Clock, onClick: () => navigateTo('/app/tasks') },
     { id: 'dev-overdue', label: 'Overdue Tasks', value: `${myOverdueTasks}`, context: myOverdueTasks > 0 ? 'Requires attention' : 'Zero slips', isPositive: myOverdueTasks === 0, icon: AlertTriangle, onClick: () => navigateTo('/app/tasks') },
     { id: 'dev-blocked', label: 'Blocked Tasks', value: `${myBlockedTasks}`, context: myBlockedTasks > 0 ? 'Needs unblock' : 'Unblocked', isPositive: myBlockedTasks === 0, icon: AlertTriangle, onClick: () => navigateTo('/app/tasks') }
   ];
 
-  // Assigned projects progress matching the prompt Section 8 example:
-  // Project Atlas (Backend 68%), Payment API (85%), Authentication (100%)
-  const assignedProjects = [
-    { id: 'p-1', name: 'Project Atlas — Core Microservices', track: 'Backend', progress: 68 },
-    { id: 'p-2', name: 'Payment API & Settlement Gateway', track: 'Webhooks', progress: 85 },
-    { id: 'p-3', name: 'Zero-Trust Authentication Engine', track: 'Security', progress: 100 }
-  ];
+  const myAssignedProjectsList = projects.filter(p => p.teamIds?.includes(currentUser.id) || p.managerId === currentUser.id);
+  const assignedProjects = myAssignedProjectsList.map(proj => {
+    const prog = calculateProjectProgress(proj.id);
+    return {
+      id: proj.id,
+      name: proj.name,
+      track: (proj.tags && proj.tags[0]) || 'Core Engineering',
+      progress: prog.overall || 0
+    };
+  });
 
   // Ticket breakdown
   const ticketStatuses = [
-    { label: 'Open', count: myTickets.filter(t => t.status === 'open').length || 1, color: 'text-blue-400' },
-    { label: 'In Progress', count: myTickets.filter(t => t.status === 'in_progress').length || 2, color: 'text-turquoise' },
-    { label: 'Waiting', count: myTickets.filter(t => t.status === 'waiting').length || 1, color: 'text-amber-400' },
-    { label: 'Resolved', count: myTickets.filter(t => t.status === 'resolved' || t.status === 'closed').length || 6, color: 'text-emerald-400' }
+    { label: 'Open', count: myTickets.filter(t => t.status === 'open').length, color: 'text-blue-400' },
+    { label: 'In Progress', count: myTickets.filter(t => t.status === 'in_progress').length, color: 'text-turquoise' },
+    { label: 'Waiting', count: myTickets.filter(t => t.status === 'waiting').length, color: 'text-amber-400' },
+    { label: 'Resolved', count: myTickets.filter(t => t.status === 'resolved' || t.status === 'closed').length, color: 'text-emerald-400' }
   ];
 
   return (
@@ -110,7 +114,11 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({ enabledW
             }
           >
             <div className="space-y-3">
-              {assignedProjects.map(proj => (
+              {assignedProjects.length === 0 ? (
+                <div className="py-6 text-center text-xs text-crm-textMuted">
+                  No projects currently assigned to you.
+                </div>
+              ) : assignedProjects.map(proj => (
                 <div key={proj.id} className="p-3 bg-crm-surface border border-crm-border/60 rounded text-xs">
                   <div className="flex items-center justify-between mb-1.5">
                     <div>
@@ -137,7 +145,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({ enabledW
             <WidgetContainer
               title="My Assigned Tickets"
               subtitle="Bug reports and task escalations assigned to you"
-              badge={`${myTickets.length || 4} Total`}
+              badge={`${myTickets.length} Total`}
               action={
                 <button
                   onClick={() => navigateTo('/app/tickets')}

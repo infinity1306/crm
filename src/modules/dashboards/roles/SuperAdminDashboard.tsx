@@ -32,11 +32,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     employees, 
     projects, 
     deals, 
+    leads,
     tickets, 
     tasks, 
     financeMetrics, 
     attendanceRecords, 
     leaveRequests,
+    evaluateProjectHealth,
     navigateTo 
   } = useCRM();
 
@@ -81,10 +83,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     {
       id: 'employees',
       label: 'Total Headcount',
-      value: '127',
-      change: '+6 this month',
+      value: `${employees.length}`,
+      change: `${employees.length} active`,
       isPositive: true,
-      context: 'Across 6 departments',
+      context: `Across ${new Set(employees.map(e => e.department)).size} departments`,
       icon: Users,
       onClick: () => navigateTo('/app/team')
     },
@@ -111,17 +113,22 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
   ];
 
   // Secondary Metrics
-  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
-  const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length || 118;
-  const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length || 84;
-  const overdueTasksCount = tasks.filter(t => t.status !== 'done' && t.deadline && t.deadline < '2026-09-21').length;
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const todayRecords = attendanceRecords.filter(r => (r.date === todayDateStr || r.date === '2026-09-27'));
+  const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length;
+  const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length;
+  const onBreakCount = todayRecords.filter(r => r.sessionState === 'on_break').length;
+  const onLeaveCount = todayRecords.filter(r => r.status === 'leave').length;
+  const lateCount = todayRecords.filter(r => r.status === 'late' || r.lateMinutes > 0).length;
+  const overdueTasksCount = tasks.filter(t => t.status !== 'done' && t.deadline && t.deadline < todayDateStr).length;
   const pendingLeavesCount = leaveRequests.filter(l => l.status === 'pending').length;
+  const delayedProjectsCount = projects.filter(p => p.health === 'delayed' || evaluateProjectHealth(p.id) === 'delayed').length;
 
   const secondaryMetrics: MetricItem[] = [
     { id: 'present-today', label: 'Present Today', value: `${presentCount}`, context: '96% punctuality rate', icon: UserCheck, onClick: () => navigateTo('/app/attendance') },
     { id: 'working-now', label: 'Working Now', value: `${workingNowCount}`, context: 'Active shift desks', icon: Clock, onClick: () => navigateTo('/app/attendance/working-now') },
     { id: 'overdue-tasks', label: 'Overdue Tasks', value: `${overdueTasksCount}`, context: 'Action requested', icon: AlertTriangle, onClick: () => navigateTo('/app/tasks') },
-    { id: 'delayed-projects', label: 'Delayed Projects', value: '1', context: 'SLA risk in Phase 2', icon: FolderKanban, onClick: () => navigateTo('/app/projects') },
+    { id: 'delayed-projects', label: 'Delayed Projects', value: `${delayedProjectsCount}`, context: delayedProjectsCount > 0 ? 'Requires attention' : 'On schedule', isPositive: delayedProjectsCount === 0, icon: FolderKanban, onClick: () => navigateTo('/app/projects') },
     { id: 'pending-approvals', label: 'Pending Leaves', value: `${pendingLeavesCount}`, context: 'Awaiting HR/Manager review', icon: Clock, onClick: () => navigateTo('/app/leave') },
     { id: 'overdue-invoices', label: 'Overdue Invoices', value: `${financeMetrics.overdueInvoicesCount}`, context: `$${financeMetrics.totalOverdue.toLocaleString()} past due`, icon: Receipt, onClick: () => navigateTo('/app/finance/overdue') }
   ];
@@ -171,12 +178,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Employees</span>
-                <p className="text-lg font-bold font-mono text-crm-text mt-1">127</p>
+                <p className="text-lg font-bold font-mono text-crm-text mt-1">{employees.length}</p>
                 <p className="text-[10px] text-emerald-400">98% active</p>
               </div>
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Departments</span>
-                <p className="text-lg font-bold font-mono text-crm-text mt-1">6</p>
+                <p className="text-lg font-bold font-mono text-crm-text mt-1">{new Set(employees.map(e => e.department)).size}</p>
                 <p className="text-[10px] text-crm-textMuted">Eng, Sales, Fin, HR...</p>
               </div>
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
@@ -186,7 +193,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
               </div>
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Client Accounts</span>
-                <p className="text-lg font-bold font-mono text-crm-text mt-1">18</p>
+                <p className="text-lg font-bold font-mono text-crm-text mt-1">{leads.length}</p>
                 <p className="text-[10px] text-crm-textMuted">Enterprise Tier</p>
               </div>
             </div>
@@ -198,7 +205,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
           <WidgetContainer
             title="Workforce Pulse"
             subtitle="Real-time shift presence"
-            badge="118 / 127 Present"
+            badge={`${presentCount} / ${employees.length} Present`}
             badgeType="success"
           >
             <div className="space-y-2.5 text-xs">
@@ -208,15 +215,15 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
               </div>
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">On Break / Idle:</span>
-                <span className="font-mono font-bold text-amber-400">12</span>
+                <span className="font-mono font-bold text-amber-400">{onBreakCount}</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">On Approved Leave:</span>
-                <span className="font-mono font-bold text-crm-text">4 Staff</span>
+                <span className="font-mono font-bold text-crm-text">{onLeaveCount} Staff</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">Late Punch-ins:</span>
-                <span className="font-mono font-bold text-red-400">3 (&lt;15 min)</span>
+                <span className="font-mono font-bold text-red-400">{lateCount}</span>
               </div>
             </div>
           </WidgetContainer>

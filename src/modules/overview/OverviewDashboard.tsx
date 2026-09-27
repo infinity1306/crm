@@ -77,10 +77,10 @@ export const OverviewDashboard: React.FC = () => {
     {
       id: 'total-employees',
       label: 'Total Employees',
-      value: '127',
+      value: `${employees.length}`,
       change: '+12%',
       isPositive: true,
-      context: 'Across 6 departments',
+      context: `Across ${new Set(employees.map(e => e.department)).size} departments`,
       icon: Users,
       onClick: () => navigateTo('/app/team')
     },
@@ -117,22 +117,34 @@ export const OverviewDashboard: React.FC = () => {
     {
       id: 'pending-approvals',
       label: 'Pending Approvals',
-      value: '6',
+      value: `${pendingInvites + pendingLeaveCount}`,
       change: '-14%',
       isPositive: true,
-      context: '3 access, 3 invites',
+      context: `${pendingLeaveCount} leave, ${pendingInvites} onboarding`,
       icon: Clock,
       onClick: () => navigateTo('/app/team')
     }
   ];
 
-  const departmentBreakdown = [
-    { name: 'Engineering', count: 62, percentage: 49, color: 'bg-teal-500' },
-    { name: 'Sales & Growth', count: 28, percentage: 22, color: 'bg-emerald-500' },
-    { name: 'Product & Design', count: 16, percentage: 13, color: 'bg-indigo-500' },
-    { name: 'HR & Operations', count: 12, percentage: 9, color: 'bg-amber-500' },
-    { name: 'Finance', count: 9, percentage: 7, color: 'bg-cyan-500' },
-  ];
+  const deptColors: Record<string, string> = {
+    Engineering: 'bg-teal-500',
+    Sales: 'bg-emerald-500',
+    Operations: 'bg-indigo-500',
+    HR: 'bg-amber-500',
+    Finance: 'bg-cyan-500'
+  };
+  const deptCounts = employees.reduce((acc, emp) => {
+    const dept = emp.department || 'Operations';
+    acc[dept] = (acc[dept] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const departmentBreakdown = Object.entries(deptCounts).map(([name, count]) => ({
+    name,
+    count,
+    percentage: employees.length > 0 ? Math.round((count / employees.length) * 100) : 0,
+    color: deptColors[name] || 'bg-teal-500'
+  }));
 
   const operationalServices = [
     { name: 'Internal CRM Engine', status: 'Operational', latency: '18ms' },
@@ -346,7 +358,7 @@ export const OverviewDashboard: React.FC = () => {
                 </h2>
               </div>
               <span className="text-[11px] font-mono text-crm-textMuted">
-                127 Total Headcount
+                {employees.length} Total Headcount
               </span>
             </div>
 

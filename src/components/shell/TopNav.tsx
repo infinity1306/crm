@@ -185,7 +185,7 @@ export const TopNav: React.FC = () => {
               <button
                 onClick={() => {
                   setQuickCreateOpen(false);
-                  navigateTo('/app/team/emp-1');
+                  navigateTo('/app/team');
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 text-crm-text hover:bg-crm-surface hover:text-turquoise transition-colors text-left"
               >

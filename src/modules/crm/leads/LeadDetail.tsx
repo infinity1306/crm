@@ -507,7 +507,7 @@ export const LeadDetail: React.FC<LeadDetailProps> = ({ leadId }) => {
                       scheduleMeeting({
                         title: `Strategy Call with ${lead.name}`,
                         type: 'online',
-                        meetingUrl: 'https://meet.google.com/scl-demo',
+                        meetingUrl: 'https://meet.google.com/new',
                         leadId: lead.id,
                         clientName: lead.name,
                         companyName: lead.companyName,

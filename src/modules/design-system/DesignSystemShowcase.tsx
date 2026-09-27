@@ -217,10 +217,10 @@ export const DesignSystemShowcase: React.FC = () => {
             <span className="text-[11px] font-mono text-crm-textMuted block mb-2">Avatars with Status Indicators</span>
             <div className="flex items-center gap-4">
               <Avatar name="Tanmay Pandey" size="xs" status="active" />
-              <Avatar name="Shivanshu Sharma" size="sm" status="active" />
-              <Avatar name="Siddharth Rao" size="md" status="invited" />
+              <Avatar name="Alex Morgan" size="sm" status="active" />
+              <Avatar name="Taylor Swift" size="md" status="invited" />
               <Avatar name="Riya Verma" size="lg" status="active" />
-              <Avatar name="Rajesh Gupta" size="xl" status="suspended" />
+              <Avatar name="Jordan Lee" size="xl" status="suspended" />
             </div>
           </div>
         </div>
