@@ -16,6 +16,7 @@ import {
   BarChart3, 
   Settings, 
   ShieldCheck, 
+  Lock,
   Building2, 
   History, 
   Layers,
@@ -62,6 +63,7 @@ interface NavGroup {
 export const Sidebar: React.FC = () => {
   const { 
     currentUser,
+    isAdminAuthenticated,
     currentPath, 
     navigateTo, 
     isSidebarCollapsed, 
@@ -356,7 +358,12 @@ export const Sidebar: React.FC = () => {
               {!isSidebarCollapsed && (
                 <div className="flex items-center justify-between flex-1 min-w-0">
                   <span className="truncate">Admin Dashboard</span>
-                  <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">Ops</span>
+                  <span className={cn(
+                    "text-[9px] uppercase px-1 py-0.2 rounded font-mono",
+                    isAdminAuthenticated ? "bg-amber-500/20 text-amber-300" : "bg-red-500/20 text-red-300"
+                  )}>
+                    {isAdminAuthenticated ? 'Ops' : 'Lock'}
+                  </span>
                 </div>
               )}
               {(currentPath === '/app/admin-dashboard' || (currentPath === '/app/dashboard' && localStorage.getItem('scl_dashboard_view_mode') !== 'employee')) && (

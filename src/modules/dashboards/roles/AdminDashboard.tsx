@@ -31,7 +31,8 @@ import {
   Laptop,
   Building2,
   TrendingUp,
-  FileCheck
+  FileCheck,
+  Lock
 } from 'lucide-react';
 import { OfficeQRModal } from '../../attendance/OfficeQRModal';
 import { AttendanceKioskModal } from '../../attendance/AttendanceKioskModal';
@@ -41,11 +42,13 @@ import { ShiftManagementModal } from '../../attendance/ShiftManagementModal';
 interface AdminDashboardProps {
   enabledWidgets?: WidgetId[];
   onSwitchToEmployee?: () => void;
+  onLockSession?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   enabledWidgets,
-  onSwitchToEmployee 
+  onSwitchToEmployee,
+  onLockSession 
 }) => {
   const { 
     currentUser,
@@ -207,6 +210,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Quick Actions & Employee View Switcher */}
           <div className="flex items-center gap-3 flex-wrap justify-end">
+            {onLockSession && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onLockSession}
+                className="text-xs border-red-500/30 text-red-300 hover:bg-red-500/10 gap-1.5 shadow-sm"
+                title="Lock Admin Session"
+              >
+                <Lock className="w-3.5 h-3.5 text-red-400" />
+                <span>Lock Portal</span>
+              </Button>
+            )}
+
             {onSwitchToEmployee && (
               <Button
                 variant="outline"

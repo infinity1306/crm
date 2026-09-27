@@ -199,6 +199,11 @@ interface CRMContextType {
   isSidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean | ((prev: boolean) => boolean)) => void;
   
+  // Admin Portal Authentication
+  isAdminAuthenticated: boolean;
+  adminLogin: (email: string, passwordOrPin: string) => Promise<{ success: boolean; error?: string }>;
+  adminLogout: () => void;
+
   // Toasts
   toasts: ToastMessage[];
   addToast: (toast: Omit<ToastMessage, 'id'>) => void;
@@ -314,6 +319,11 @@ const CRMContext = createContext<CRMContextType | undefined>(undefined);
 
 export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Phase 1 state with localStorage fallback
+  // Admin Portal Session Authentication
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('scl_admin_authenticated') === 'true';
+  });
+
   const [currentUser, setCurrentUser] = useState<Employee>(() => {
     const saved = localStorage.getItem('scl_current_user');
     return saved ? JSON.parse(saved) : INITIAL_CURRENT_USER;
@@ -744,6 +754,66 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Phase 1 Methods
+  // Admin Portal Login & Lock methods
+  const adminLogin = async (email: string, passwordOrPin: string): Promise<{ success: boolean; error?: string }> => {
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPass = passwordOrPin.trim();
+
+    const matchedAdmin = employees.find(
+      e => e.email.toLowerCase() === trimmedEmail && (e.role === 'admin' || e.role === 'super_admin' || e.role === 'manager')
+    );
+
+    const isMasterEmail = trimmedEmail === 'admin@starchainlabs.com' || trimmedEmail === 'admin';
+    const isValidPass = trimmedPass === 'admin123' || trimmedPass === 'admin@2026' || trimmedPass === '9988' || trimmedPass === 'password';
+
+    if ((matchedAdmin || isMasterEmail) && isValidPass) {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem('scl_admin_authenticated', 'true');
+
+      const adminUser = matchedAdmin || employees.find(e => e.role === 'admin' || e.role === 'super_admin') || currentUser;
+      setCurrentUser({
+        ...adminUser,
+        role: adminUser.role === 'employee' ? 'admin' : adminUser.role
+      });
+
+      logAudit(
+        'ADMIN_PORTAL_LOGIN', 
+        'SECURITY_AUTH', 
+        adminUser.id, 
+        'Administrator authenticated into Admin Control Center.'
+      );
+
+      addToast({
+        type: 'success',
+        title: 'Administrator Clearance Granted',
+        message: `Welcome to the Admin Command Center, ${adminUser.name}.`
+      });
+
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error: 'Invalid administrator credentials. Access restricted to authorized Star Chain Labs managers.'
+    };
+  };
+
+  const adminLogout = () => {
+    setIsAdminAuthenticated(false);
+    sessionStorage.removeItem('scl_admin_authenticated');
+    logAudit(
+      'ADMIN_PORTAL_LOCK', 
+      'SECURITY_AUTH', 
+      currentUser.id, 
+      'Administrator locked admin portal session.'
+    );
+    addToast({
+      type: 'info',
+      title: 'Admin Session Locked',
+      message: 'Administrative clearance locked. Returning to staff view.'
+    });
+  };
+
   const updateEmployee = (id: string, partial: Partial<Employee>) => {
     setEmployees(prev => prev.map(emp => {
       if (emp.id === id) {
@@ -3118,6 +3188,9 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <CRMContext.Provider value={{
+      isAdminAuthenticated,
+      adminLogin,
+      adminLogout,
       currentUser,
       employees,
       invitations,
