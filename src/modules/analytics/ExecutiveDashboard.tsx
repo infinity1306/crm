@@ -38,7 +38,7 @@ export const ExecutiveDashboard: React.FC = () => {
   const openTickets = tickets.filter(t => t.status !== 'resolved' && t.status !== 'closed');
   const criticalTickets = openTickets.filter(t => t.priority === 'critical');
 
-  const todayRecords = attendanceRecords.filter(r => r.date === '2026-09-21');
+  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length;
   const workingNow = todayRecords.filter(r => r.sessionState === 'working' || r.sessionState === 'on_break').length;
 

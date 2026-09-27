@@ -111,7 +111,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
   ];
 
   // Secondary Metrics
-  const todayRecords = attendanceRecords.filter(r => r.date === '2026-09-21');
+  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length || 118;
   const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length || 84;
   const overdueTasksCount = tasks.filter(t => t.status !== 'done' && t.deadline && t.deadline < '2026-09-21').length;

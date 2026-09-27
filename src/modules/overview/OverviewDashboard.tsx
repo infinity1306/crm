@@ -57,7 +57,7 @@ export const OverviewDashboard: React.FC = () => {
   const pendingInvites = invitations.filter(i => i.status === 'pending').length;
 
   // Phase 4 Live Workforce Telemetry
-  const todayRecords = attendanceRecords.filter(r => r.date === '2026-09-21');
+  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length;
   const onBreakCount = todayRecords.filter(r => r.sessionState === 'on_break').length;
   const presentTodayCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length;

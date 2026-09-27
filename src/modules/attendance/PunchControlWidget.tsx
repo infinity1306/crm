@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useCRM } from '../../context/CRMContext';
 import { 
-  Clock, 
   Play, 
-  Square, 
   Coffee, 
+  LogOut, 
+  MapPin, 
+  QrCode, 
+  Navigation, 
+  Tablet, 
   CheckCircle2, 
-  AlertCircle, 
   FolderKanban, 
   CheckSquare, 
-  ChevronDown,
-  Sparkles,
-  Timer
+  Timer,
+  Clock,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
-import { Select } from '../../components/ui/Select';
+import { WorkMode, CheckInMethod } from '../../types/attendance';
+import { OfficeQRModal } from './OfficeQRModal';
+import { GPSCheckInModal } from './GPSCheckInModal';
+import { AttendanceKioskModal } from './AttendanceKioskModal';
+import { DEFAULT_SHIFTS } from '../../services/attendanceService';
 
 interface PunchControlWidgetProps {
   compact?: boolean;
@@ -31,24 +37,24 @@ export const PunchControlWidget: React.FC<PunchControlWidgetProps> = ({ compact 
     punchOut, 
     startBreak, 
     endBreak,
-    attendanceConfig 
+    todayDateStr
   } = useCRM();
 
-  // Current live clock state
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [workMode, setWorkMode] = useState<WorkMode>('OFFICE');
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
-  const [breakReason, setBreakReason] = useState<string>('Lunch Break');
-  const [showProjectPicker, setShowProjectPicker] = useState<boolean>(false);
+  
+  // Modals state
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const [isGpsOpen, setIsGpsOpen] = useState(false);
+  const [isKioskOpen, setIsKioskOpen] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Set default project & task if user has assigned tasks
   useEffect(() => {
     if (!selectedProjectId && projects.length > 0) {
       const userProject = projects.find(p => p.teamIds.includes(currentUser.id)) || projects[0];
@@ -62,254 +68,243 @@ export const PunchControlWidget: React.FC<PunchControlWidgetProps> = ({ compact 
     }
   }, [projects, tasks, currentUser.id, selectedProjectId]);
 
-  const timeFormatted = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-  const dateFormatted = currentTime.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const shift = DEFAULT_SHIFTS[0];
+  const sessionState = currentUserAttendance?.sessionState || 'not_started';
 
-  // Calculate live elapsed working time
+  // Live elapsed time
   const getElapsedDuration = (): string => {
     if (!currentUserAttendance || !currentUserAttendance.punchIn || currentUserAttendance.punchIn === '00:00') {
       return '00h 00m';
     }
     if (currentUserAttendance.punchOut) {
-      const mins = currentUserAttendance.totalWorkingMinutes;
-      const h = Math.floor(mins / 60);
-      const m = mins % 60;
-      return `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m`;
+      const mins = currentUserAttendance.totalWorkingMinutes || 0;
+      return `${String(Math.floor(mins / 60)).padStart(2, '0')}h ${String(mins % 60).padStart(2, '0')}m`;
     }
 
     const [inH, inM] = currentUserAttendance.punchIn.split(':').map(Number);
     const nowMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-    const punchInMinutes = inH * 60 + inM;
-    const elapsed = Math.max(0, nowMinutes - punchInMinutes - (currentUserAttendance.breakMinutes || 0));
-    const h = Math.floor(elapsed / 60);
-    const m = elapsed % 60;
-    return `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m`;
+    const elapsed = Math.max(0, nowMinutes - (inH * 60 + inM) - (currentUserAttendance.breakMinutes || 0));
+    return `${String(Math.floor(elapsed / 60)).padStart(2, '0')}h ${String(elapsed % 60).padStart(2, '0')}m`;
   };
 
-  const getElapsedBreakDuration = (): string => {
-    if (!currentUserAttendance || currentUserAttendance.sessionState !== 'on_break') {
-      return '00m';
-    }
-    const currentBreak = currentUserAttendance.breaks[currentUserAttendance.breaks.length - 1];
-    if (!currentBreak) return '00m';
-
-    const [bH, bM] = currentBreak.start.split(':').map(Number);
-    const nowMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-    const breakMinutes = Math.max(0, nowMinutes - (bH * 60 + bM));
-    return `${breakMinutes}m`;
-  };
-
-  const sessionState = currentUserAttendance ? currentUserAttendance.sessionState : 'not_started';
-  const firstName = currentUser.name.split(' ')[0].toUpperCase();
-
-  const handlePunchIn = () => {
-    punchIn(currentUser.id, selectedProjectId, selectedTaskId);
-  };
-
-  const handlePunchOut = () => {
-    if (window.confirm('Are you sure you want to punch out and complete your workday?')) {
-      punchOut(currentUser.id);
-    }
-  };
-
-  const handleStartBreak = () => {
-    startBreak(currentUser.id, breakReason);
-  };
-
-  const handleEndBreak = () => {
-    endBreak(currentUser.id);
-  };
-
-  // Filter tasks for selected project
-  const availableTasks = tasks.filter(t => t.projectId === selectedProjectId && t.status !== 'done');
+  const formattedDate = currentTime.toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
   return (
-    <div className="bg-[#0D1216] border border-[#1E262E] rounded-lg p-5 shadow-card relative overflow-hidden">
-      {/* Top subtle status accent line */}
-      <div 
-        className={`absolute top-0 left-0 right-0 h-0.5 ${
-          sessionState === 'working' ? 'bg-teal-500' :
-          sessionState === 'on_break' ? 'bg-amber-500' :
-          sessionState === 'completed' ? 'bg-emerald-500' : 'bg-slate-700'
-        }`} 
-      />
+    <div className={`bg-crm-card border border-crm-border rounded-xl ${compact ? 'p-4' : 'p-6'} shadow-sm relative`}>
+      {sessionState === 'not_started' ? (
+        /* SECTION 2 SPECIFICATION: NOT CHECKED IN WORKSPACE */
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-crm-border pb-3">
+            <div>
+              <h2 className="text-base font-bold text-white">Good Morning, {currentUser.name.split(' ')[0]}</h2>
+              <div className="text-xs text-slate-400 font-mono mt-0.5">{formattedDate}</div>
+            </div>
+            <div className="text-right mt-2 sm:mt-0">
+              <span className="text-xs font-mono text-teal-400 font-semibold">Shift: {shift.startTime} AM - {shift.endTime} PM</span>
+              <div className="text-[11px] text-slate-400">Today's target: 8h</div>
+            </div>
+          </div>
 
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-        {/* Left: Salutation, Digital Clock & Date */}
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-teal-400 font-semibold flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${
-                sessionState === 'working' ? 'bg-teal-400 animate-pulse' :
-                sessionState === 'on_break' ? 'bg-amber-400' :
-                sessionState === 'completed' ? 'bg-emerald-400' : 'bg-slate-500'
+          <div className="text-center py-2">
+            <Badge variant="neutral" size="md" className="font-mono">
+              NOT CHECKED IN
+            </Badge>
+          </div>
+
+          {/* SECTION 8 SPECIFICATION: WORK MODE PICKER */}
+          <div className="p-3 bg-[#12181E] border border-[#1E262E] rounded-lg">
+            <label className="text-xs text-slate-400 font-medium block mb-2">Work Location Mode</label>
+            <div className="grid grid-cols-3 gap-2">
+              {(['OFFICE', 'REMOTE', 'FIELD'] as WorkMode[]).map(mode => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setWorkMode(mode)}
+                  className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
+                    workMode === mode
+                      ? 'bg-teal-500/20 border-teal-500 text-teal-300'
+                      : 'bg-[#0B0F14] border-[#1E262E] text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {mode === 'OFFICE' ? '○ Office' : mode === 'REMOTE' ? '○ Remote' : '○ Field'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SECTION 2 & 7: CHECK IN ACTIONS (4 METHODS) */}
+          <div className="space-y-2">
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full justify-center text-sm font-bold shadow-md"
+              onClick={() => punchIn(undefined, selectedProjectId, selectedTaskId, workMode, 'WEB')}
+            >
+              <Play className="w-4 h-4 mr-2" />
+              CHECK IN
+            </Button>
+
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsQrOpen(true)}
+                className="justify-center text-xs"
+              >
+                <QrCode className="w-3.5 h-3.5 mr-1 text-teal-400" />
+                Office QR
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsGpsOpen(true)}
+                className="justify-center text-xs"
+              >
+                <Navigation className="w-3.5 h-3.5 mr-1 text-teal-400" />
+                GPS Punch
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsKioskOpen(true)}
+                className="justify-center text-xs"
+              >
+                <Tablet className="w-3.5 h-3.5 mr-1 text-teal-400" />
+                Kiosk Mode
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* SECTION 2 SPECIFICATION: ACTIVE SESSION (WORKING / BREAK / COMPLETED) */
+        <div className="space-y-4">
+          <div className="flex items-center justify-between border-b border-crm-border pb-3">
+            <div className="flex items-center gap-2">
+              <span className={`w-3 h-3 rounded-full ${
+                sessionState === 'working' ? 'bg-teal-400 animate-ping' : 
+                sessionState === 'on_break' ? 'bg-amber-400 animate-pulse' : 'bg-slate-500'
               }`} />
-              {sessionState === 'working' ? 'WORK SESSION ACTIVE' :
-               sessionState === 'on_break' ? 'ON BREAK' :
-               sessionState === 'completed' ? 'WORKDAY COMPLETE' : 'NOT STARTED'}
-            </span>
-            <span className="text-slate-600 text-xs">•</span>
-            <span className="text-[11px] font-mono text-slate-400">
-              Shift Policy: {attendanceConfig.expectedStartTime} AM ({Math.round(attendanceConfig.workdayDurationMinutes / 60)}h)
-            </span>
+              <span className="text-xs font-bold font-mono tracking-wider text-white uppercase">
+                {sessionState === 'working' ? '● WORKING' : sessionState === 'on_break' ? '☕ ON BREAK' : 'SHIFT COMPLETED'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="turquoise" size="sm">{currentUserAttendance?.workMode || workMode}</Badge>
+              <Badge variant="neutral" size="sm">{currentUserAttendance?.checkInMethod || 'WEB'}</Badge>
+            </div>
           </div>
 
-          <div className="flex items-baseline gap-3">
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
-              {timeFormatted}
-            </h2>
-            <span className="text-xs text-slate-400 font-medium">
-              {dateFormatted}
-            </span>
+          <div className="grid grid-cols-3 gap-2 text-center py-2">
+            <div className="p-2.5 bg-[#0B0F14] rounded-lg border border-[#1E262E]">
+              <div className="text-[11px] text-slate-400">Checked in</div>
+              <div className="text-sm font-mono font-bold text-white mt-0.5">{currentUserAttendance?.punchIn || '--:--'}</div>
+            </div>
+            <div className="p-2.5 bg-[#0B0F14] rounded-lg border border-[#1E262E]">
+              <div className="text-[11px] text-slate-400">Time worked</div>
+              <div className="text-sm font-mono font-bold text-teal-300 mt-0.5">{getElapsedDuration()}</div>
+            </div>
+            <div className="p-2.5 bg-[#0B0F14] rounded-lg border border-[#1E262E]">
+              <div className="text-[11px] text-slate-400">Shift</div>
+              <div className="text-sm font-mono font-bold text-white mt-0.5">{shift.startTime} - {shift.endTime}</div>
+            </div>
           </div>
 
-          <p className="text-xs text-slate-400">
-            {sessionState === 'not_started' && (
-              <span>Good morning, <strong className="text-slate-200">{currentUser.name}</strong>. Ready to begin your workday?</span>
-            )}
+          {/* Project & Task Section */}
+          <div className="p-3 bg-[#12181E] border border-[#1E262E] rounded-lg text-xs space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400 flex items-center gap-1.5">
+                <FolderKanban className="w-3.5 h-3.5 text-teal-400" /> Project
+              </span>
+              <span className="text-white font-semibold">{currentUserAttendance?.currentProjectName || 'CRM Platform'}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400 flex items-center gap-1.5">
+                <CheckSquare className="w-3.5 h-3.5 text-teal-400" /> Task
+              </span>
+              <span className="text-teal-300 font-semibold">{currentUserAttendance?.currentTaskTitle || 'Attendance Engine'}</span>
+            </div>
+          </div>
+
+          {/* Session Action Buttons */}
+          <div className="flex gap-3 pt-1">
             {sessionState === 'working' && (
-              <span>Working since <strong className="text-white font-mono">{currentUserAttendance?.punchIn} AM</strong></span>
+              <>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => startBreak(undefined, 'Lunch Break')}
+                  className="flex-1 justify-center"
+                >
+                  <Coffee className="w-4 h-4 mr-2 text-amber-400" />
+                  START BREAK
+                </Button>
+                <Button
+                  variant="danger"
+                  size="md"
+                  onClick={() => punchOut()}
+                  className="flex-1 justify-center"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  CHECK OUT
+                </Button>
+              </>
             )}
+
             {sessionState === 'on_break' && (
-              <span>On break since <strong className="text-amber-300 font-mono">{currentUserAttendance?.breaks[currentUserAttendance.breaks.length - 1]?.start}</strong></span>
-            )}
-            {sessionState === 'completed' && (
-              <span>Logged <strong className="text-white font-mono">{getElapsedDuration()}</strong> total working time today</span>
-            )}
-          </p>
-        </div>
-
-        {/* Center: Live Duration & Connected Project */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-2 px-4 rounded-lg bg-[#12181E] border border-[#1E262E]">
-          {/* Work Duration Counter */}
-          <div className="space-y-0.5">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-              {sessionState === 'on_break' ? 'Break Elapsed' : 'Time Worked'}
-            </span>
-            <div className="text-xl font-bold font-mono tracking-tight text-white flex items-center gap-1.5">
-              <Timer className={`w-4 h-4 ${sessionState === 'working' ? 'text-teal-400' : 'text-slate-500'}`} />
-              <span>{sessionState === 'on_break' ? getElapsedBreakDuration() : getElapsedDuration()}</span>
-            </div>
-          </div>
-
-          <div className="hidden sm:block w-px h-8 bg-[#1E262E]" />
-
-          {/* Active Work Delivery Context */}
-          <div className="space-y-0.5 max-w-[240px]">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-              Delivery Context
-            </span>
-            <div className="text-xs truncate">
-              {currentUserAttendance?.currentProjectName ? (
-                <div className="flex items-center gap-1.5 text-slate-200 truncate">
-                  <FolderKanban className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                  <span className="truncate">{currentUserAttendance.currentProjectName}</span>
-                </div>
-              ) : selectedProjectId ? (
-                <div className="flex items-center gap-1.5 text-slate-300 truncate">
-                  <FolderKanban className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="truncate">{projects.find(p => p.id === selectedProjectId)?.name || 'Project'}</span>
-                </div>
-              ) : (
-                <span className="text-slate-500 italic">No project linked</span>
-              )}
-            </div>
-            {currentUserAttendance?.currentTaskTitle && (
-              <div className="text-[11px] text-slate-400 truncate flex items-center gap-1">
-                <CheckSquare className="w-3 h-3 text-slate-500 shrink-0" />
-                <span className="truncate">{currentUserAttendance.currentTaskTitle}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right: Primary Punch / Break / Punch Out Controls */}
-        <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto justify-end">
-          {sessionState === 'not_started' && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-              {/* Optional Project Assignment Dropdown */}
-              <div className="flex items-center gap-1">
-                <Select
-                  value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
-                  options={[
-                    { value: '', label: 'Select Project (Optional)' },
-                    ...projects.map(p => ({ value: p.id, label: p.name }))
-                  ]}
-                  className="text-xs max-w-[180px]"
-                />
-              </div>
-
               <Button
                 variant="primary"
                 size="md"
-                className="bg-teal-600 hover:bg-teal-500 text-white font-mono tracking-wider font-semibold text-xs px-5 shadow-sm"
-                leftIcon={<Play className="w-3.5 h-3.5 fill-current" />}
-                onClick={handlePunchIn}
+                onClick={() => endBreak()}
+                className="w-full justify-center"
               >
-                PUNCH IN
+                <Play className="w-4 h-4 mr-2" />
+                END BREAK / RESUME WORK
               </Button>
-            </div>
-          )}
+            )}
 
-          {sessionState === 'working' && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="text-xs font-mono border-slate-700 text-slate-300 hover:text-white"
-                leftIcon={<Coffee className="w-3.5 h-3.5 text-amber-400" />}
-                onClick={handleStartBreak}
-              >
-                START BREAK
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="sm"
-                className="text-xs font-mono bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                leftIcon={<Square className="w-3.5 h-3.5 fill-current" />}
-                onClick={handlePunchOut}
-              >
-                PUNCH OUT
-              </Button>
-            </div>
-          )}
-
-          {sessionState === 'on_break' && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="primary"
-                size="sm"
-                className="bg-teal-600 hover:bg-teal-500 text-white text-xs font-mono tracking-wider"
-                leftIcon={<Play className="w-3.5 h-3.5 fill-current" />}
-                onClick={handleEndBreak}
-              >
-                RESUME WORK
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="sm"
-                className="text-xs font-mono bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                leftIcon={<Square className="w-3.5 h-3.5 fill-current" />}
-                onClick={handlePunchOut}
-              >
-                PUNCH OUT
-              </Button>
-            </div>
-          )}
-
-          {sessionState === 'completed' && (
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 text-xs font-mono text-emerald-400 px-3 py-1.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Shift Completed ({currentUserAttendance?.punchIn} — {currentUserAttendance?.punchOut})</span>
-              </span>
-            </div>
-          )}
+            {sessionState === 'completed' && (
+              <div className="w-full text-center text-xs text-slate-400 p-2 bg-[#12181E] rounded-lg">
+                Today's session finished ({currentUserAttendance?.punchIn} — {currentUserAttendance?.punchOut})
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Modals for 4 Check-In Methods */}
+      <OfficeQRModal
+        isOpen={isQrOpen}
+        onClose={() => setIsQrOpen(false)}
+        onPunchWithQR={(token, locId) => {
+          punchIn(undefined, selectedProjectId, selectedTaskId, 'OFFICE', 'QR', locId);
+        }}
+      />
+
+      <GPSCheckInModal
+        isOpen={isGpsOpen}
+        onClose={() => setIsGpsOpen(false)}
+        onPunchWithGPS={(coords, inGeofence, locName) => {
+          punchIn(
+            undefined, 
+            selectedProjectId, 
+            selectedTaskId, 
+            inGeofence ? 'OFFICE' : 'REMOTE', 
+            'GPS', 
+            undefined, 
+            coords
+          );
+        }}
+      />
+
+      <AttendanceKioskModal
+        isOpen={isKioskOpen}
+        onClose={() => setIsKioskOpen(false)}
+      />
     </div>
   );
 };

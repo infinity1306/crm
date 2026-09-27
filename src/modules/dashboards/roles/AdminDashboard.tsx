@@ -45,7 +45,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ enabledWidgets }
   const activeProjects = projects.filter(p => p.status !== 'completed' && p.status !== 'cancelled');
   const openTickets = tickets.filter(t => t.status !== 'resolved' && t.status !== 'closed');
   const activePipelineValue = deals.filter(d => d.stage !== 'lost' && d.stage !== 'won').reduce((sum, d) => sum + d.value, 0);
-  const todayRecords = attendanceRecords.filter(r => r.date === '2026-09-21');
+  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length || 118;
 
   const primaryMetrics: MetricItem[] = [

@@ -47,7 +47,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const personaRef = useRef<HTMLDivElement>(null);
 
   // Shift & attendance calculation for header quick punch action
-  const myRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && (r.date === '2026-09-21' || r.date === new Date().toISOString().split('T')[0]));
+  const myRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && ((r.date === '2026-09-27' || r.date === '2026-09-21') || r.date === new Date().toISOString().split('T')[0]));
   const isPunchedIn = Boolean(myRecord && (myRecord.status === 'present' || myRecord.status === 'working' || myRecord.sessionState === 'working'));
   const workMins = myRecord?.totalWorkingMinutes || 382;
   const workHoursStr = `${Math.floor(workMins / 60)}h ${workMins % 60}m`;
@@ -145,7 +145,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         );
 
       case 'developer':
-        const myRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && r.date === '2026-09-21');
+        const myRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && (r.date === '2026-09-27' || r.date === '2026-09-21'));
         const isWorking = myRecord ? (myRecord.status === 'present' || myRecord.status === 'working') : true;
         const punchIn = myRecord?.punchIn || '09:14 AM';
         return (

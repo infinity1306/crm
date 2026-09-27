@@ -26,5 +26,7 @@ dist-ssr
 
 # Environment & Deployments
 .env
+.env
 .env.*
+!.env.example
 .vercel

@@ -80,7 +80,7 @@ export const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employeeId }) 
   const employeeTasks = tasks.filter(t => t.assigneeId === employee.id);
 
   // Today's attendance record (Sep 21, 2026)
-  const todayRecord = attendanceRecords.find(r => r.employeeId === employee.id && r.date === '2026-09-21');
+  const todayRecord = attendanceRecords.find(r => r.employeeId === employee.id && (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const employeeAttendanceRecords = attendanceRecords.filter(r => r.employeeId === employee.id);
 
   // Monthly summary

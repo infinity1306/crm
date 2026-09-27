@@ -33,7 +33,7 @@ export const HRDashboard: React.FC<HRDashboardProps> = ({ enabledWidgets }) => {
 
   const isEnabled = (id: WidgetId) => enabledWidgets.includes(id);
 
-  const todayRecords = attendanceRecords.filter(r => r.date === '2026-09-21');
+  const todayRecords = attendanceRecords.filter(r => (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const presentCount = todayRecords.filter(r => r.status === 'present' || r.status === 'working' || r.status === 'late').length || 118;
   const workingNowCount = todayRecords.filter(r => r.sessionState === 'working').length || 84;
   const pendingLeaves = leaveRequests.filter(l => l.status === 'pending');

@@ -17,7 +17,7 @@ export const PersonalAttendanceWidget: React.FC = () => {
     addToast
   } = useCRM();
 
-  const todayRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && r.date === '2026-09-21');
+  const todayRecord = attendanceRecords.find(r => r.employeeId === currentUser.id && (r.date === '2026-09-27' || r.date === '2026-09-21'));
   const isPunchedIn = todayRecord && (todayRecord.status === 'present' || todayRecord.status === 'working' || todayRecord.sessionState === 'working');
   const isOnBreak = todayRecord?.sessionState === 'on_break';
 

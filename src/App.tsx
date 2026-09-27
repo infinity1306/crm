@@ -42,6 +42,7 @@ import { InternalTicketsDesk } from './modules/tickets/InternalTicketsDesk';
 import { AttendanceDashboard } from './modules/attendance/AttendanceDashboard';
 import { WorkingNowFloor } from './modules/attendance/WorkingNowFloor';
 import { EmployeeAttendanceProfile } from './modules/attendance/EmployeeAttendanceProfile';
+import { MyAttendanceView } from './modules/attendance/MyAttendanceView';
 import { LeaveManagementDesk } from './modules/leave/LeaveManagementDesk';
 
 // Phase 5 Finance, Revenue & Billing Modules
@@ -247,7 +248,7 @@ export const App: React.FC = () => {
     }
 
     if (currentPath === '/app/my-attendance') {
-      return <EmployeeAttendanceProfile employeeId={currentUser.id} />;
+      return <MyAttendanceView />;
     }
 
     // Phase 5 Finance, Revenue & Billing Routes
