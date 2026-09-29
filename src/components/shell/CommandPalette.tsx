@@ -182,6 +182,14 @@ export const CommandPalette: React.FC = () => {
       onSelect: () => navigateTo('/app/team')
     },
     {
+      id: 'page-recruitment',
+      category: 'Pages',
+      title: 'Recruitment Tracker (HR & Super Admin)',
+      subtitle: 'Applicant screening pipeline, telephonic, HR & managerial rounds with salary benchmarks',
+      icon: UserPlus,
+      onSelect: () => navigateTo('/app/recruitment')
+    },
+    {
       id: 'page-notifs',
       category: 'Pages',
       title: 'Notifications',

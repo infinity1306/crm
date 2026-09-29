@@ -47,6 +47,7 @@ import { EmployeeAttendanceProfile } from './modules/attendance/EmployeeAttendan
 import { MyAttendanceView } from './modules/attendance/MyAttendanceView';
 import { LeaveManagementDesk } from './modules/leave/LeaveManagementDesk';
 import { CompanyCalendar } from './modules/calendar/CompanyCalendar';
+import { RecruitmentTracker } from './modules/recruitment/RecruitmentTracker';
 
 // Phase 5 Finance, Revenue & Billing Modules
 import { FinanceOverview } from './modules/finance/FinanceOverview';
@@ -272,6 +273,10 @@ export const App: React.FC = () => {
 
     if (currentPath === '/app/calendar' || currentPath === '/app/company-calendar') {
       return <CompanyCalendar />;
+    }
+
+    if (currentPath === '/app/recruitment' || currentPath === '/app/recruitment-tracker') {
+      return <RecruitmentTracker />;
     }
 
     // Phase 5 Finance, Revenue & Billing Routes
