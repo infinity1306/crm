@@ -27,7 +27,7 @@ import {
   Building2, 
   Calendar, 
   User, 
-  DollarSign, 
+  IndianRupee, 
   Clock, 
   ExternalLink, 
   Copy, 
@@ -260,7 +260,7 @@ export const SalesDocumentGenerator: React.FC = () => {
 
   // Format Currency
   const formatCurrency = (amount: number, curr: string = 'INR') => {
-    const symbol = curr === 'INR' ? '₹' : curr === 'USD' ? '$' : '€';
+    const symbol = curr === 'EUR' ? '€' : '₹';
     return `${symbol}${amount.toLocaleString('en-IN')}`;
   };
 
@@ -696,7 +696,7 @@ export const SalesDocumentGenerator: React.FC = () => {
               onChange={(e) => setCurrency(e.target.value as any)}
             >
               <option value="INR">INR (₹ - Indian Rupee)</option>
-              <option value="USD">USD ($ - US Dollar)</option>
+              <option value="USD">USD (₹ Equivalent)</option>
               <option value="EUR">EUR (€ - Euro)</option>
             </Select>
 

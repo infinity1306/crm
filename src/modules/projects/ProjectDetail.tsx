@@ -45,7 +45,7 @@ import {
   Send,
   Upload,
   User,
-  DollarSign,
+  IndianRupee,
   CreditCard
 } from 'lucide-react';
 
@@ -424,7 +424,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
           { id: 'timeline', label: 'Daily Timeline', icon: Clock },
           { id: 'team', label: `Team (${project.teamMembers.length})`, icon: Users },
           { id: 'files', label: `Files (${projectFileList.length})`, icon: Files },
-          { id: 'billing', label: `Finance & Billing (${projectInvoices.length})`, icon: DollarSign }
+          { id: 'billing', label: `Finance & Billing (${projectInvoices.length})`, icon: IndianRupee }
         ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

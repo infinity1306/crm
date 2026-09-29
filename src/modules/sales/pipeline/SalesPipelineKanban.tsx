@@ -9,7 +9,7 @@ import {
   Briefcase, 
   Building2, 
   Calendar, 
-  DollarSign, 
+  IndianRupee, 
   Plus, 
   TrendingUp, 
   ArrowRight, 
@@ -154,7 +154,7 @@ export const SalesPipelineKanban: React.FC = () => {
             <div className="text-xl font-bold text-crm-text mt-0.5">₹{(metrics.avgSize / 100000).toFixed(1)}L</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-crm-surface border border-crm-border flex items-center justify-center text-crm-textMuted">
-            <DollarSign className="w-4 h-4" />
+            <IndianRupee className="w-4 h-4" />
           </div>
         </div>
 

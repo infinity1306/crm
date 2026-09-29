@@ -24,7 +24,7 @@ import {
   AlertTriangle,
   FileCheck2,
   CheckSquare,
-  DollarSign,
+  IndianRupee,
   CreditCard,
   Receipt
 } from 'lucide-react';
@@ -477,7 +477,7 @@ export const OverviewDashboard: React.FC = () => {
           <Card className="border-teal-900/40">
             <div className="flex items-center justify-between pb-3 border-b border-crm-border mb-3">
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-teal-400" />
+                <IndianRupee className="w-4 h-4 text-teal-400" />
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-crm-text">
                   Finance & Revenue Pulse
                 </h2>

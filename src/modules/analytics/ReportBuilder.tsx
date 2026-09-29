@@ -5,7 +5,7 @@ import { Badge } from '../../components/ui/Badge';
 import { DataTable, DataTableColumn } from '../../components/ui/DataTable';
 import {
   FileText, Download, Save, Filter, ChevronDown,
-  BarChart3, Users, FolderKanban, DollarSign, Clock,
+  BarChart3, Users, FolderKanban, IndianRupee, Clock,
   LifeBuoy, Building2, Briefcase, Plus, Trash2, Eye
 } from 'lucide-react';
 
@@ -24,7 +24,7 @@ const REPORT_TYPES: { value: ReportType; label: string; icon: React.ElementType 
   { value: 'projects', label: 'Project Report', icon: FolderKanban },
   { value: 'employees', label: 'Employee Report', icon: Users },
   { value: 'attendance', label: 'Attendance Report', icon: Clock },
-  { value: 'finance', label: 'Finance Report', icon: DollarSign },
+  { value: 'finance', label: 'Finance Report', icon: IndianRupee },
   { value: 'clients', label: 'Client Report', icon: Building2 },
   { value: 'tickets', label: 'Ticket Report', icon: LifeBuoy },
 ];

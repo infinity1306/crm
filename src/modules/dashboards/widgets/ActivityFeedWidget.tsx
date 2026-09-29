@@ -8,7 +8,7 @@ import {
   ChevronRight, 
   FolderKanban, 
   CheckSquare, 
-  DollarSign, 
+  IndianRupee, 
   UserCheck, 
   LifeBuoy 
 } from 'lucide-react';
@@ -66,7 +66,7 @@ export const ActivityFeedWidget: React.FC<ActivityFeedWidgetProps> = ({
       case 'deal':
       case 'invoice':
       case 'payment':
-        return DollarSign;
+        return IndianRupee;
       case 'attendance':
       case 'leave':
         return UserCheck;

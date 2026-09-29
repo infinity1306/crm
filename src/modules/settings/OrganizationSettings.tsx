@@ -162,9 +162,9 @@ export const OrganizationSettings: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
               options={[
                 { value: 'INR (₹)', label: 'INR — Indian Rupee (₹)' },
-                { value: 'USD ($)', label: 'USD — US Dollar ($)' },
+                { value: 'USD (₹)', label: 'USD — US Dollar (₹ Equiv)' },
                 { value: 'EUR (€)', label: 'EUR — Euro (€)' },
-                { value: 'SGD (S$)', label: 'SGD — Singapore Dollar (S$)' },
+                { value: 'SGD (₹)', label: 'SGD — Singapore Dollar (₹ Equiv)' },
                 { value: 'AED (د.إ)', label: 'AED — UAE Dirham (د.إ)' },
               ]}
             />

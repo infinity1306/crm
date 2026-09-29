@@ -14,7 +14,7 @@ import {
   Phone, 
   Calendar, 
   Clock, 
-  DollarSign, 
+  IndianRupee, 
   CheckCircle2, 
   ArrowRight, 
   UserCheck, 

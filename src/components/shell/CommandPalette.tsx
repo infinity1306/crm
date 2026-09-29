@@ -23,7 +23,7 @@ import {
   BarChart3,
   FolderKanban,
   LifeBuoy,
-  DollarSign,
+  IndianRupee,
   CreditCard,
   Receipt,
   FileSpreadsheet,
@@ -274,7 +274,7 @@ export const CommandPalette: React.FC = () => {
       category: 'Pages',
       title: 'Finance & Revenue Overview',
       subtitle: 'Total billed, collections, overdue, net margin & trajectory',
-      icon: DollarSign,
+      icon: IndianRupee,
       onSelect: () => navigateTo('/app/finance')
     },
     {

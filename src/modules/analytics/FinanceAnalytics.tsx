@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { DataTable, DataTableColumn } from '../../components/ui/DataTable';
 import {
-  DollarSign, CreditCard, Receipt, TrendingUp, AlertTriangle,
+  IndianRupee, CreditCard, Receipt, TrendingUp, AlertTriangle,
   BarChart3, ChevronRight, ArrowUpRight
 } from 'lucide-react';
 
@@ -46,7 +46,7 @@ export const FinanceAnalytics: React.FC = () => {
 
   // ── KPIs ──
   const kpis = [
-    { label: 'Total Revenue', value: `₹${(financeMetrics.totalRevenue / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-emerald-400' },
+    { label: 'Total Revenue', value: `₹${(financeMetrics.totalRevenue / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-emerald-400' },
     { label: 'Collected', value: `₹${(financeMetrics.totalCollected / 100000).toFixed(1)}L`, icon: CreditCard, color: 'text-teal-400' },
     { label: 'Outstanding', value: `₹${(financeMetrics.totalPending / 100000).toFixed(1)}L`, icon: Receipt, color: 'text-amber-400' },
     { label: 'Overdue', value: `₹${(financeMetrics.totalOverdue / 100000).toFixed(1)}L`, icon: AlertTriangle, color: 'text-red-400' },

@@ -139,7 +139,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <div className="flex items-center gap-3 text-xs text-crm-textMuted flex-wrap">
             <span className="text-crm-text font-medium">B2B Enterprise Sales Division</span>
             <span>·</span>
-            <span className="text-turquoise">Target: $400,000</span>
+            <span className="text-turquoise">Target: ₹4,00,000</span>
             <span>·</span>
             <span>Q3 Closing Sprint</span>
           </div>

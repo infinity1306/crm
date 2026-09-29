@@ -3,7 +3,7 @@ import { useCRM } from '../../context/CRMContext';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import {
-  Users, CheckSquare, FolderKanban, DollarSign, LifeBuoy,
+  Users, CheckSquare, FolderKanban, IndianRupee, LifeBuoy,
   Clock, Calendar, Target, BarChart3
 } from 'lucide-react';
 
@@ -98,7 +98,7 @@ export const DepartmentAnalytics: React.FC = () => {
               </span>
               {dept.isSales && dept.wonRevenue > 0 && (
                 <span className="text-emerald-400">
-                  <DollarSign className="w-3 h-3 inline mr-1" />₹{(dept.wonRevenue / 100000).toFixed(1)}L revenue
+                  <IndianRupee className="w-3 h-3 inline mr-1" />₹{(dept.wonRevenue / 100000).toFixed(1)}L revenue
                 </span>
               )}
             </div>

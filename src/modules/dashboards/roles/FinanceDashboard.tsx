@@ -6,7 +6,7 @@ import { PersonalAttendanceWidget } from '../widgets/PersonalAttendanceWidget';
 import { WidgetContainer } from '../components/WidgetContainer';
 import { WidgetId } from '../types';
 import { 
-  DollarSign, 
+  IndianRupee, 
   Receipt, 
   Clock, 
   AlertTriangle, 
@@ -28,12 +28,12 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({ enabledWidge
 
   // 6 Primary Finance Metrics (Section 9)
   const financeMetricsList: MetricItem[] = [
-    { id: 'fin-rev', label: 'Gross Revenue', value: `$${(financeMetrics.totalRevenue / 1000).toFixed(0)}k`, change: '+14%', isPositive: true, icon: DollarSign, onClick: () => navigateTo('/app/finance') },
-    { id: 'fin-coll', label: 'Collected Cash', value: `$${(financeMetrics.totalCollected / 1000).toFixed(0)}k`, context: 'Inward settled', icon: CreditCard, onClick: () => navigateTo('/app/finance/payments') },
-    { id: 'fin-out', label: 'Outstanding Receivables', value: `$${(financeMetrics.totalPending / 1000).toFixed(0)}k`, context: 'Active invoices', icon: Receipt, onClick: () => navigateTo('/app/finance/invoices') },
-    { id: 'fin-overdue', label: 'Overdue Recovery', value: `$${(financeMetrics.totalOverdue / 1000).toFixed(0)}k`, context: `${financeMetrics.overdueInvoicesCount} overdue invoices`, isPositive: financeMetrics.overdueInvoicesCount === 0, icon: AlertTriangle, onClick: () => navigateTo('/app/finance/overdue') },
-    { id: 'fin-exp', label: 'Total Expenses', value: `$${(financeMetrics.totalExpenses / 1000).toFixed(0)}k`, context: 'Approved claims', icon: Clock, onClick: () => navigateTo('/app/finance/expenses') },
-    { id: 'fin-net', label: 'Net Profit', value: `$${(financeMetrics.netRevenue / 1000).toFixed(0)}k`, change: `${financeMetrics.totalRevenue > 0 ? Math.round((financeMetrics.netRevenue / financeMetrics.totalRevenue) * 100) : 0}% margin`, isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/finance/reports') }
+    { id: 'fin-rev', label: 'Gross Revenue', value: `₹${(financeMetrics.totalRevenue / 1000).toFixed(0)}k`, change: '+14%', isPositive: true, icon: IndianRupee, onClick: () => navigateTo('/app/finance') },
+    { id: 'fin-coll', label: 'Collected Cash', value: `₹${(financeMetrics.totalCollected / 1000).toFixed(0)}k`, context: 'Inward settled', icon: CreditCard, onClick: () => navigateTo('/app/finance/payments') },
+    { id: 'fin-out', label: 'Outstanding Receivables', value: `₹${(financeMetrics.totalPending / 1000).toFixed(0)}k`, context: 'Active invoices', icon: Receipt, onClick: () => navigateTo('/app/finance/invoices') },
+    { id: 'fin-overdue', label: 'Overdue Recovery', value: `₹${(financeMetrics.totalOverdue / 1000).toFixed(0)}k`, context: `${financeMetrics.overdueInvoicesCount} overdue invoices`, isPositive: financeMetrics.overdueInvoicesCount === 0, icon: AlertTriangle, onClick: () => navigateTo('/app/finance/overdue') },
+    { id: 'fin-exp', label: 'Total Expenses', value: `₹${(financeMetrics.totalExpenses / 1000).toFixed(0)}k`, context: 'Approved claims', icon: Clock, onClick: () => navigateTo('/app/finance/expenses') },
+    { id: 'fin-net', label: 'Net Profit', value: `₹${(financeMetrics.netRevenue / 1000).toFixed(0)}k`, change: `${financeMetrics.totalRevenue > 0 ? Math.round((financeMetrics.netRevenue / financeMetrics.totalRevenue) * 100) : 0}% margin`, isPositive: true, icon: TrendingUp, onClick: () => navigateTo('/app/finance/reports') }
   ];
 
   // Expenses breakdown
@@ -69,7 +69,7 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({ enabledWidge
                 <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
               </div>
               <p className="text-[11px] text-crm-textMuted">
-                ${financeMetrics.totalOverdue.toLocaleString()} pending recovery. Issue payment dunning letters.
+                ₹{financeMetrics.totalOverdue.toLocaleString('en-IN')} pending recovery. Issue payment dunning letters.
               </p>
             </div>
 
@@ -139,7 +139,7 @@ export const FinanceDashboard: React.FC<FinanceDashboardProps> = ({ enabledWidge
             </div>
             <div className="p-3 bg-crm-surface border border-crm-border/60 rounded">
               <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Total Approved</span>
-              <p className="text-base font-bold font-mono text-crm-text mt-1">${(financeMetrics.totalExpenses / 1000).toFixed(0)}k</p>
+              <p className="text-base font-bold font-mono text-crm-text mt-1">₹{(financeMetrics.totalExpenses / 1000).toFixed(0)}k</p>
               <p className="text-[10px] text-crm-textMuted">MTD Budget</p>
             </div>
           </div>

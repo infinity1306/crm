@@ -3,7 +3,7 @@ import { useCRM } from '../../context/CRMContext';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { DataTable, DataTableColumn } from '../../components/ui/DataTable';
-import { Target, ChevronLeft, Users, TrendingUp, DollarSign } from 'lucide-react';
+import { Target, ChevronLeft, Users, TrendingUp, IndianRupee } from 'lucide-react';
 
 interface RepRow {
   id: string;
@@ -122,7 +122,7 @@ export const SalesPerformance: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Total Reps', value: rows.length, icon: Users, color: 'text-indigo-400' },
-          { label: 'Combined Revenue', value: `₹${(rows.reduce((s, r) => s + r.revenue, 0) / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-emerald-400' },
+          { label: 'Combined Revenue', value: `₹${(rows.reduce((s, r) => s + r.revenue, 0) / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-emerald-400' },
           { label: 'Revenue Target', value: `₹${(rows.reduce((s, r) => s + r.revenueTarget, 0) / 100000).toFixed(1)}L`, icon: Target, color: 'text-amber-400' },
           { label: 'Avg. Conversion', value: `${rows.length > 0 ? Math.round(rows.reduce((s, r) => s + r.conversionRate, 0) / rows.length) : 0}%`, icon: TrendingUp, color: 'text-turquoise' },
         ].map(kpi => (

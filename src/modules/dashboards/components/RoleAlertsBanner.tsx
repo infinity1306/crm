@@ -198,7 +198,7 @@ export const RoleAlertsBanner: React.FC<RoleAlertsBannerProps> = ({ persona }) =
       alerts.push({
         id: 'fin-overdue',
         type: 'critical',
-        title: `Overdue Receivables: $${financeMetrics.totalOverdue.toLocaleString()}`,
+        title: `Overdue Receivables: ₹${financeMetrics.totalOverdue.toLocaleString('en-IN')}`,
         desc: `${financeMetrics.overdueInvoicesCount} invoices pending payment follow-up`,
         path: '/app/finance/overdue',
         icon: Receipt

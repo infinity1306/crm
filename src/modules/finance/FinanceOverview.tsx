@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { CreateInvoiceModal } from './invoices/CreateInvoiceModal';
 import { 
-  DollarSign, 
+  IndianRupee, 
   TrendingUp, 
   Clock, 
   AlertTriangle, 
@@ -277,7 +277,7 @@ export const FinanceOverview: React.FC = () => {
             <span className="text-[10px] font-mono uppercase tracking-wider text-crm-textSecondary group-hover:text-rose-400">
               Expenses
             </span>
-            <DollarSign className="w-3.5 h-3.5 text-rose-400" />
+            <IndianRupee className="w-3.5 h-3.5 text-rose-400" />
           </div>
           <p className="text-xl font-bold font-mono text-rose-300">
             ₹{(filteredMetrics.totalExpenses / 100000).toFixed(2)}L

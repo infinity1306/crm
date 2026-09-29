@@ -9,7 +9,7 @@ import {
   XCircle,
   Clock,
   Building2,
-  DollarSign,
+  IndianRupee,
   FileText,
   Upload,
   User,

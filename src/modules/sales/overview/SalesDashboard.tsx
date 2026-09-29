@@ -6,7 +6,7 @@ import { Avatar } from '../../../components/ui/Avatar';
 import { 
   BarChart3, 
   TrendingUp, 
-  DollarSign, 
+  IndianRupee, 
   Briefcase, 
   Target, 
   Users, 

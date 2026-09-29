@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import {
   ChevronLeft, Clock, CheckSquare, FolderKanban, LifeBuoy,
-  FileText, Calendar, DollarSign, Users, BarChart3, Target
+  FileText, Calendar, IndianRupee, Users, BarChart3, Target
 } from 'lucide-react';
 
 interface Props {
@@ -178,7 +178,7 @@ export const EmployeePerformanceDetail: React.FC<Props> = ({ employeeId }) => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-1.5">
-              <DollarSign className="w-3.5 h-3.5 text-turquoise" />
+              <IndianRupee className="w-3.5 h-3.5 text-turquoise" />
               <CardTitle>Sales & Revenue Contribution</CardTitle>
             </div>
           </CardHeader>

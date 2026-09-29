@@ -21,7 +21,7 @@ import {
   Clock, 
   Building2, 
   UserCheck, 
-  DollarSign, 
+  IndianRupee, 
   MoreHorizontal,
   ChevronRight,
   TrendingUp,
@@ -208,7 +208,7 @@ export const LeadsList: React.FC = () => {
             <div className="text-xl font-bold text-crm-text mt-0.5">₹{(stats.totalValue / 100000).toFixed(1)}L</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-crm-surface border border-crm-border flex items-center justify-center text-emerald-400">
-            <DollarSign className="w-4 h-4" />
+            <IndianRupee className="w-4 h-4" />
           </div>
         </div>
 

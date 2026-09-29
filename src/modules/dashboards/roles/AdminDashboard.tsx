@@ -15,7 +15,7 @@ import {
   Users, 
   UserCheck, 
   FolderKanban, 
-  DollarSign, 
+  IndianRupee, 
   ChevronRight,
   Clock,
   AlertTriangle,

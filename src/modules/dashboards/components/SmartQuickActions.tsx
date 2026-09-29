@@ -12,7 +12,7 @@ import {
   Calendar, 
   FileText, 
   Receipt, 
-  DollarSign, 
+  IndianRupee, 
   MessageSquare,
   Sparkles,
   Send
@@ -74,7 +74,7 @@ export const SmartQuickActions: React.FC<SmartQuickActionsProps> = ({ persona })
           { id: 'new-lead', label: 'Add Lead', icon: Plus, onClick: () => navigateTo('/app/crm/leads') },
           { id: 'schedule-meeting', label: 'Schedule Meeting', icon: Calendar, onClick: () => navigateTo('/app/sales/meetings') },
           { id: 'add-followup', label: 'Log Activity', icon: FileText, onClick: () => navigateTo('/app/sales/activities') },
-          { id: 'new-deal', label: 'Create Deal', icon: DollarSign, onClick: () => navigateTo('/app/sales/pipeline') }
+          { id: 'new-deal', label: 'Create Deal', icon: IndianRupee, onClick: () => navigateTo('/app/sales/pipeline') }
         ];
 
       case 'developer':
@@ -87,7 +87,7 @@ export const SmartQuickActions: React.FC<SmartQuickActionsProps> = ({ persona })
       case 'finance':
         return [
           { id: 'new-invoice', label: 'Create Invoice', icon: Receipt, onClick: () => navigateTo('/app/finance/invoices') },
-          { id: 'record-payment', label: 'Record Inward Payment', icon: DollarSign, onClick: () => navigateTo('/app/finance/payments') },
+          { id: 'record-payment', label: 'Record Inward Payment', icon: IndianRupee, onClick: () => navigateTo('/app/finance/payments') },
           { id: 'submit-expense', label: 'Add Expense Claim', icon: FileText, onClick: () => navigateTo('/app/finance/expenses') }
         ];
 

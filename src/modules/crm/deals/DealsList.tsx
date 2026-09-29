@@ -9,7 +9,7 @@ import {
   Briefcase, 
   Search, 
   Plus, 
-  DollarSign, 
+  IndianRupee, 
   Building2, 
   TrendingUp, 
   Calendar, 

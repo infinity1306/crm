@@ -121,7 +121,7 @@ export const ClientProjectPortalWidget: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-mono font-bold text-crm-text">${inv.total.toLocaleString()}</span>
+                <span className="font-mono font-bold text-crm-text">₹{inv.total.toLocaleString('en-IN')}</span>
                 <Badge variant={inv.status === 'paid' ? 'success' : inv.status === 'overdue' ? 'error' : 'warning'}>
                   {inv.status.replace('_', ' ').toUpperCase()}
                 </Badge>

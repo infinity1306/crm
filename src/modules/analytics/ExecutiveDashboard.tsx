@@ -3,7 +3,7 @@ import { useCRM } from '../../context/CRMContext';
 import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import {
-  DollarSign, CreditCard, AlertTriangle, TrendingUp, TrendingDown,
+  IndianRupee, CreditCard, AlertTriangle, TrendingUp, TrendingDown,
   Briefcase, FolderKanban, LifeBuoy, Users, Clock, CheckSquare,
   Activity, ChevronRight, ArrowUpRight, Target, Receipt, BarChart3,
   Zap, ArrowRight, Calendar, UserCheck, FileText
@@ -51,7 +51,7 @@ export const ExecutiveDashboard: React.FC = () => {
 
   // ── KPI Cards ──
   const kpiCards = [
-    { id: 'revenue', label: 'Total Revenue', value: `₹${(financeMetrics.totalRevenue / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-emerald-400', bg: 'bg-emerald-950/30', path: '/app/finance/revenue' },
+    { id: 'revenue', label: 'Total Revenue', value: `₹${(financeMetrics.totalRevenue / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-emerald-400', bg: 'bg-emerald-950/30', path: '/app/finance/revenue' },
     { id: 'collected', label: 'Collected', value: `₹${(financeMetrics.totalCollected / 100000).toFixed(1)}L`, icon: CreditCard, color: 'text-teal-400', bg: 'bg-teal-950/30', path: '/app/finance/payments' },
     { id: 'outstanding', label: 'Outstanding', value: `₹${(financeMetrics.totalPending / 100000).toFixed(1)}L`, icon: Receipt, color: 'text-amber-400', bg: 'bg-amber-950/30', path: '/app/finance/overdue' },
     { id: 'active-deals', label: 'Active Deals', value: `${activeDeals.filter(d => d.stage !== 'won').length}`, icon: Briefcase, color: 'text-indigo-400', bg: 'bg-indigo-950/30', path: '/app/crm/deals' },

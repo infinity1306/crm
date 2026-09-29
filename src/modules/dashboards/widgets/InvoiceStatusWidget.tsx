@@ -2,7 +2,7 @@ import React from 'react';
 import { useCRM } from '../../../context/CRMContext';
 import { WidgetContainer } from '../components/WidgetContainer';
 import { Badge } from '../../../components/ui/Badge';
-import { Receipt, DollarSign, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
+import { Receipt, IndianRupee, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
 
 export const InvoiceStatusWidget: React.FC = () => {
   const { invoices, payments, financeMetrics, navigateTo } = useCRM();
@@ -22,7 +22,7 @@ export const InvoiceStatusWidget: React.FC = () => {
       {/* Invoices Status Grid */}
       <WidgetContainer
         title="Invoice Lifecycle Overview"
-        subtitle={`Total Active Billing: $${financeMetrics.totalRevenue.toLocaleString()}`}
+        subtitle={`Total Active Billing: ₹${financeMetrics.totalRevenue.toLocaleString('en-IN')}`}
         badge={`${invoices.length} Invoices`}
         action={
           <button
@@ -72,7 +72,7 @@ export const InvoiceStatusWidget: React.FC = () => {
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                  <DollarSign className="w-3.5 h-3.5" />
+                  <IndianRupee className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
                   <p className="font-semibold text-crm-text truncate">{p.clientName}</p>
@@ -83,7 +83,7 @@ export const InvoiceStatusWidget: React.FC = () => {
               </div>
 
               <div className="text-right flex-shrink-0 font-mono">
-                <span className="font-bold text-emerald-400">+${p.amount.toLocaleString()}</span>
+                <span className="font-bold text-emerald-400">+₹{p.amount.toLocaleString('en-IN')}</span>
                 <p className="text-[10px] text-crm-textMuted">{p.date}</p>
               </div>
             </div>

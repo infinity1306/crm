@@ -51,7 +51,7 @@ export const ActionCenterWidget: React.FC<ActionCenterWidgetProps> = ({
     .forEach(inv => {
       items.push({
         id: `inv-${inv.id}`,
-        title: `Overdue Invoice: ${inv.invoiceNumber} ($${inv.total.toLocaleString()})`,
+        title: `Overdue Invoice: ${inv.invoiceNumber} (₹${inv.total.toLocaleString('en-IN')})`,
         subtitle: `${inv.clientName} · Due ${inv.dueDate}`,
         category: 'finance',
         severity: 'critical',

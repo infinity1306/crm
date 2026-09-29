@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { DataTable, DataTableColumn } from '../../components/ui/DataTable';
 import {
-  Target, TrendingUp, Briefcase, Users, DollarSign,
+  Target, TrendingUp, Briefcase, Users, IndianRupee,
   ArrowUpRight, ChevronRight, BarChart3, Calendar
 } from 'lucide-react';
 
@@ -77,8 +77,8 @@ export const SalesAnalytics: React.FC = () => {
     { label: 'Won Deals', value: wonDeals.length, icon: TrendingUp, color: 'text-emerald-400' },
     { label: 'Lost Deals', value: lostDeals.length, icon: Target, color: 'text-red-400' },
     { label: 'Conversion Rate', value: `${conversionRate}%`, icon: ArrowUpRight, color: 'text-turquoise' },
-    { label: 'Pipeline Value', value: `₹${(pipelineValue / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-amber-400' },
-    { label: 'Closed Revenue', value: `₹${(closedRevenue / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-emerald-400' },
+    { label: 'Pipeline Value', value: `₹${(pipelineValue / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-amber-400' },
+    { label: 'Closed Revenue', value: `₹${(closedRevenue / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-emerald-400' },
   ];
 
   // ── Deals Table ──

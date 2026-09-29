@@ -12,7 +12,7 @@ import {
   ExternalLink,
   CheckCircle2,
   PhoneCall,
-  DollarSign
+  IndianRupee
 } from 'lucide-react';
 import RecordPaymentModal from '../payments/RecordPaymentModal';
 

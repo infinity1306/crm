@@ -5,7 +5,7 @@ import { Modal } from '../../../components/ui/Modal';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
-import { Briefcase, DollarSign, Calendar, Percent } from 'lucide-react';
+import { Briefcase, IndianRupee, Calendar, Percent } from 'lucide-react';
 
 interface AddDealModalProps {
   isOpen: boolean;
@@ -167,7 +167,7 @@ export const AddDealModal: React.FC<AddDealModalProps> = ({
             onChange={e => setValue(Number(e.target.value))}
             placeholder="350000"
             required
-            leftIcon={<DollarSign className="w-3.5 h-3.5 text-crm-textMuted" />}
+            leftIcon={<IndianRupee className="w-3.5 h-3.5 text-crm-textMuted" />}
           />
           <Select
             label="Pipeline Stage"

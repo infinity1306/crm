@@ -9,7 +9,7 @@ import { PersonalAttendanceWidget } from '../widgets/PersonalAttendanceWidget';
 import { WidgetContainer } from '../components/WidgetContainer';
 import { WidgetId } from '../types';
 import { 
-  DollarSign, 
+  IndianRupee, 
   Target, 
   FolderKanban, 
   Users, 
@@ -53,11 +53,11 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     {
       id: 'total-revenue',
       label: 'Total Revenue',
-      value: `$${(financeMetrics.totalCollected / 1000).toFixed(0)}k`,
+      value: `₹${(financeMetrics.totalCollected / 1000).toFixed(0)}k`,
       change: '+18.4%',
       isPositive: true,
       context: 'Recognized collections',
-      icon: DollarSign,
+      icon: IndianRupee,
       onClick: () => navigateTo('/app/finance')
     },
     {
@@ -66,7 +66,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
       value: `${activeDealsCount}`,
       change: '+4 this week',
       isPositive: true,
-      context: `$${(deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0) / 1000).toFixed(0)}k in pipeline`,
+      context: `₹${(deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0) / 1000).toFixed(0)}k in pipeline`,
       icon: Target,
       onClick: () => navigateTo('/app/sales/pipeline')
     },
@@ -103,7 +103,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     {
       id: 'outstanding-payments',
       label: 'Outstanding Dues',
-      value: `$${(financeMetrics.totalPending / 1000).toFixed(0)}k`,
+      value: `₹${(financeMetrics.totalPending / 1000).toFixed(0)}k`,
       change: financeMetrics.overdueInvoicesCount > 0 ? `${financeMetrics.overdueInvoicesCount} overdue` : 'Healthy',
       isPositive: financeMetrics.overdueInvoicesCount === 0,
       context: 'Net receivables',
@@ -130,7 +130,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     { id: 'overdue-tasks', label: 'Overdue Tasks', value: `${overdueTasksCount}`, context: 'Action requested', icon: AlertTriangle, onClick: () => navigateTo('/app/tasks') },
     { id: 'delayed-projects', label: 'Delayed Projects', value: `${delayedProjectsCount}`, context: delayedProjectsCount > 0 ? 'Requires attention' : 'On schedule', isPositive: delayedProjectsCount === 0, icon: FolderKanban, onClick: () => navigateTo('/app/projects') },
     { id: 'pending-approvals', label: 'Pending Leaves', value: `${pendingLeavesCount}`, context: 'Awaiting HR/Manager review', icon: Clock, onClick: () => navigateTo('/app/leave') },
-    { id: 'overdue-invoices', label: 'Overdue Invoices', value: `${financeMetrics.overdueInvoicesCount}`, context: `$${financeMetrics.totalOverdue.toLocaleString()} past due`, icon: Receipt, onClick: () => navigateTo('/app/finance/overdue') }
+    { id: 'overdue-invoices', label: 'Overdue Invoices', value: `${financeMetrics.overdueInvoicesCount}`, context: `₹${financeMetrics.totalOverdue.toLocaleString('en-IN')} past due`, icon: Receipt, onClick: () => navigateTo('/app/finance/overdue') }
   ];
 
   return (
@@ -189,7 +189,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Deals Won</span>
                 <p className="text-lg font-bold font-mono text-turquoise mt-1">{deals.filter(d => d.stage === 'won').length}</p>
-                <p className="text-[10px] text-crm-textMuted">Avg size $38k</p>
+                <p className="text-[10px] text-crm-textMuted">Avg size ₹38k</p>
               </div>
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Client Accounts</span>
@@ -234,21 +234,21 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
           <WidgetContainer
             title="Finance Pulse"
             subtitle="Cashflow & net liquidity"
-            badge={`Net $${(financeMetrics.netRevenue / 1000).toFixed(0)}k`}
+            badge={`Net ₹${(financeMetrics.netRevenue / 1000).toFixed(0)}k`}
             badgeType="primary"
           >
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">Revenue Collected:</span>
-                <span className="font-mono font-bold text-emerald-400">${financeMetrics.totalCollected.toLocaleString()}</span>
+                <span className="font-mono font-bold text-emerald-400">₹{financeMetrics.totalCollected.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">Total Invoiced:</span>
-                <span className="font-mono font-bold text-crm-text">${financeMetrics.totalRevenue.toLocaleString()}</span>
+                <span className="font-mono font-bold text-crm-text">₹{financeMetrics.totalRevenue.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">Total Expenses:</span>
-                <span className="font-mono font-bold text-amber-400">${financeMetrics.totalExpenses.toLocaleString()}</span>
+                <span className="font-mono font-bold text-amber-400">₹{financeMetrics.totalExpenses.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex items-center justify-between p-2 bg-crm-surface rounded border border-crm-border/50">
                 <span className="text-crm-textMuted">Gross Margin:</span>

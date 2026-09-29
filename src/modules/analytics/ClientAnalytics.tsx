@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { DataTable, DataTableColumn } from '../../components/ui/DataTable';
 import {
-  Building2, DollarSign, FolderKanban, Briefcase, LifeBuoy,
+  Building2, IndianRupee, FolderKanban, Briefcase, LifeBuoy,
   ChevronRight, Users
 } from 'lucide-react';
 
@@ -86,8 +86,8 @@ export const ClientAnalytics: React.FC = () => {
         {[
           { label: 'Total Clients', value: totalClients, icon: Building2, color: 'text-indigo-400' },
           { label: 'Active (Revenue)', value: clientsWithRevenue, icon: Users, color: 'text-emerald-400' },
-          { label: 'Total Revenue', value: `₹${(totalRevenue / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-turquoise' },
-          { label: 'Outstanding', value: `₹${(totalOutstanding / 100000).toFixed(1)}L`, icon: DollarSign, color: 'text-amber-400' },
+          { label: 'Total Revenue', value: `₹${(totalRevenue / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-turquoise' },
+          { label: 'Outstanding', value: `₹${(totalOutstanding / 100000).toFixed(1)}L`, icon: IndianRupee, color: 'text-amber-400' },
         ].map(kpi => (
           <div key={kpi.label} className="bg-crm-card border border-crm-border rounded-lg p-3.5">
             <div className="flex items-center gap-1.5 mb-1">

@@ -12,7 +12,7 @@ import {
   Globe, 
   MapPin, 
   Users, 
-  DollarSign, 
+  IndianRupee, 
   Briefcase, 
   Mail, 
   Phone, 
@@ -290,7 +290,7 @@ export const CompanyDetail: React.FC<CompanyDetailProps> = ({ companyId }) => {
                   activeTab === 'financials' ? "bg-turquoise-subtle text-turquoise border border-turquoise-subtleBorder" : "text-crm-textSecondary hover:text-crm-text"
                 )}
               >
-                <DollarSign className="w-3.5 h-3.5" />
+                <IndianRupee className="w-3.5 h-3.5" />
                 <span>Financials & Invoices ({companyInvoices.length})</span>
               </button>
             </div>

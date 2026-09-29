@@ -5,7 +5,7 @@ import { Drawer } from '../../../components/ui/Drawer';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
-import { UserPlus, Calendar, Clock, DollarSign, Building, Mail, Phone, Tag } from 'lucide-react';
+import { UserPlus, Calendar, Clock, IndianRupee, Building, Mail, Phone, Tag } from 'lucide-react';
 
 interface AddLeadDrawerProps {
   isOpen: boolean;
@@ -250,7 +250,7 @@ export const AddLeadDrawer: React.FC<AddLeadDrawerProps> = ({
         {/* Financials & Timeline */}
         <div className="p-3.5 rounded-lg bg-crm-surface/60 border border-crm-border space-y-3">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-crm-textMuted flex items-center gap-1.5">
-            <DollarSign className="w-3.5 h-3.5 text-turquoise" />
+            <IndianRupee className="w-3.5 h-3.5 text-turquoise" />
             <span>Financials & Follow-up Scheduling</span>
           </div>
 

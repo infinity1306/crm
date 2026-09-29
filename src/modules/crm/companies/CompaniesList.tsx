@@ -11,7 +11,7 @@ import {
   Globe, 
   MapPin, 
   Briefcase, 
-  DollarSign, 
+  IndianRupee, 
   ChevronRight, 
   ExternalLink,
   Users,
@@ -100,7 +100,7 @@ export const CompaniesList: React.FC = () => {
             <div className="text-xl font-bold text-turquoise mt-0.5">₹{(totalAccountsValuation / 100000).toFixed(1)}L</div>
           </div>
           <div className="w-9 h-9 rounded-md bg-turquoise/10 border border-turquoise/20 flex items-center justify-center text-turquoise">
-            <DollarSign className="w-4 h-4" />
+            <IndianRupee className="w-4 h-4" />
           </div>
         </div>
 

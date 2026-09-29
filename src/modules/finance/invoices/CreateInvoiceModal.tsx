@@ -269,7 +269,7 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
                   className="w-full bg-crm-surface border border-crm-border rounded p-2 text-xs text-crm-text font-mono"
                 >
                   <option value="INR">INR (₹)</option>
-                  <option value="USD">USD ($)</option>
+                  <option value="USD">USD (₹ Equiv)</option>
                   <option value="EUR">EUR (€)</option>
                 </select>
               </div>
@@ -328,7 +328,7 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
                       </div>
 
                       <div className="w-32 text-right font-mono font-medium text-crm-text px-2">
-                        {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : '€'}{item.amount.toLocaleString('en-IN')}
+                        {currency === 'EUR' ? '€' : '₹'}{item.amount.toLocaleString('en-IN')}
                       </div>
 
                       <button
@@ -366,7 +366,7 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
                 <div className="flex justify-between py-1 border-b border-crm-border/60">
                   <span className="text-crm-textSecondary">Line Items Subtotal:</span>
                   <span className="text-crm-text font-medium">
-                    {currency === 'INR' ? '₹' : '$'}{subtotal.toLocaleString('en-IN')}
+                    {currency === 'EUR' ? '€' : '₹'}{subtotal.toLocaleString('en-IN')}
                   </span>
                 </div>
 
@@ -390,7 +390,7 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
                     />
                   </div>
                   <span className="text-amber-400">
-                    -{currency === 'INR' ? '₹' : '$'}{discountAmount.toLocaleString('en-IN')}
+                    -{currency === 'EUR' ? '€' : '₹'}{discountAmount.toLocaleString('en-IN')}
                   </span>
                 </div>
 
@@ -407,13 +407,13 @@ export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({
                     <span className="text-[10px] text-crm-textMuted">%</span>
                   </div>
                   <span className="text-crm-text">
-                    +{currency === 'INR' ? '₹' : '$'}{Math.round(taxAmount).toLocaleString('en-IN')}
+                    +{currency === 'EUR' ? '€' : '₹'}{Math.round(taxAmount).toLocaleString('en-IN')}
                   </span>
                 </div>
 
                 <div className="flex justify-between pt-2 text-sm font-bold text-teal-300">
                   <span>Grand Total (Due):</span>
-                  <span>{currency === 'INR' ? '₹' : '$'}{grandTotal.toLocaleString('en-IN')}</span>
+                  <span>{currency === 'EUR' ? '€' : '₹'}{grandTotal.toLocaleString('en-IN')}</span>
                 </div>
               </div>
             </div>
