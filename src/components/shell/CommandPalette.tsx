@@ -246,6 +246,14 @@ export const CommandPalette: React.FC = () => {
       onSelect: () => navigateTo('/app/leave')
     },
     {
+      id: 'page-calendar',
+      category: 'Pages',
+      title: 'Company Calendar — Offs & Celebrations',
+      subtitle: 'Official company offs, team birthdays, work anniversaries, events & 10 to 7 shift',
+      icon: Calendar,
+      onSelect: () => navigateTo('/app/calendar')
+    },
+    {
       id: 'page-my-attendance',
       category: 'Pages',
       title: 'My Attendance & Punch Control',

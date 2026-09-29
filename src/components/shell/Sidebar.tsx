@@ -155,6 +155,7 @@ export const Sidebar: React.FC = () => {
         { id: 'my-attendance', label: 'My Attendance & Clock', path: '/app/my-attendance', icon: Clock, isImplemented: true },
         { id: 'attendance-desk', label: 'Attendance Dashboard', path: '/app/attendance', icon: CalendarClock, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager'] },
         { id: 'working-now', label: 'Working Now (Live Floor)', path: '/app/attendance/working-now', icon: UserCheck, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager'], badge: workingNowCount > 0 ? workingNowCount : undefined, badgeType: 'primary' },
+        { id: 'company-calendar', label: 'Company Calendar & Offs', path: '/app/calendar', icon: Calendar, isImplemented: true },
         { id: 'leave', label: 'Leave Desk', path: '/app/leave', icon: Calendar, isImplemented: true, badge: pendingLeaveCount > 0 ? pendingLeaveCount : undefined, badgeType: 'warning' },
       ]
     },
@@ -228,6 +229,7 @@ export const Sidebar: React.FC = () => {
       items: [
         { id: 'my-segments', label: 'My 3 Segments & Profile', path: '/app/profile', icon: UserCheck, isImplemented: true },
         { id: 'employees', label: 'Employees Directory', path: '/app/team', icon: Users, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager', 'developer', 'sales_exec', 'sales_manager', 'finance'], badge: pendingInvitesCount > 0 ? pendingInvitesCount : undefined, badgeType: 'neutral' },
+        { id: 'team-calendar', label: 'Offs & Celebrations Calendar', path: '/app/calendar', icon: Calendar, isImplemented: true },
       ]
     },
     {

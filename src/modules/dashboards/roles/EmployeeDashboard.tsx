@@ -200,7 +200,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onSwitchTo
                 <Calendar className="w-3.5 h-3.5 text-turquoise" />
                 <span>Sunday, 27 Sep 2026</span>
               </div>
-              <p className="text-[10px] text-crm-textMuted font-mono">HQ Time: 09:30 AM IST</p>
+              <p className="text-[10px] text-crm-textMuted font-mono">Office Shift: 10:00 AM – 07:00 PM IST</p>
             </div>
 
             {canSwitchToAdmin && onSwitchToAdmin && (

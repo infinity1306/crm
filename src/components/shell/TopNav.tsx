@@ -112,11 +112,16 @@ export const TopNav: React.FC = () => {
 
       {/* Right Controls */}
       <div className="flex items-center gap-3 ml-4">
-        {/* Date Display (matching user reference screenshot: Sun, 21 Sep 2026) */}
-        <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded bg-crm-surface/60 border border-crm-border/60 text-xs text-crm-textSecondary font-medium">
+        {/* Date Display - Links to Company Calendar */}
+        <button
+          onClick={() => navigateTo('/app/calendar')}
+          title="Open Company Calendar & Offs"
+          className="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded bg-crm-surface/60 hover:bg-crm-surface border border-crm-border/60 hover:border-turquoise/40 text-xs text-crm-textSecondary hover:text-turquoise font-medium transition-colors cursor-pointer"
+        >
           <Calendar className="w-3.5 h-3.5 text-turquoise" />
-          <span>Sun, 21 Sep 2026</span>
-        </div>
+          <span>Tue, 29 Sep 2026</span>
+          <span className="text-[10px] text-crm-textMuted font-mono">10:00–19:00</span>
+        </button>
 
         {/* Universal Quick Attendance Punch In/Out Pill (For all internal roles) */}
         {currentUser.role !== 'client' && (

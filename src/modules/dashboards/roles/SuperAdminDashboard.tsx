@@ -8,6 +8,7 @@ import { PipelineFunnelWidget } from '../widgets/PipelineFunnelWidget';
 import { PersonalAttendanceWidget } from '../widgets/PersonalAttendanceWidget';
 import { WidgetContainer } from '../components/WidgetContainer';
 import { WidgetId } from '../types';
+import { formatINR } from '../../../utils/indianNumberSystem';
 import { 
   IndianRupee, 
   Target, 
@@ -53,7 +54,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     {
       id: 'total-revenue',
       label: 'Total Revenue',
-      value: `₹${(financeMetrics.totalCollected / 1000).toFixed(0)}k`,
+      value: formatINR(financeMetrics.totalCollected, { compact: true }),
       change: '+18.4%',
       isPositive: true,
       context: 'Recognized collections',
@@ -66,7 +67,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
       value: `${activeDealsCount}`,
       change: '+4 this week',
       isPositive: true,
-      context: `₹${(deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0) / 1000).toFixed(0)}k in pipeline`,
+      context: `${formatINR(deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + d.value, 0), { compact: true })} in pipeline`,
       icon: Target,
       onClick: () => navigateTo('/app/sales/pipeline')
     },
@@ -103,7 +104,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
     {
       id: 'outstanding-payments',
       label: 'Outstanding Dues',
-      value: `₹${(financeMetrics.totalPending / 1000).toFixed(0)}k`,
+      value: formatINR(financeMetrics.totalPending, { compact: true }),
       change: financeMetrics.overdueInvoicesCount > 0 ? `${financeMetrics.overdueInvoicesCount} overdue` : 'Healthy',
       isPositive: financeMetrics.overdueInvoicesCount === 0,
       context: 'Net receivables',
@@ -189,7 +190,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Deals Won</span>
                 <p className="text-lg font-bold font-mono text-turquoise mt-1">{deals.filter(d => d.stage === 'won').length}</p>
-                <p className="text-[10px] text-crm-textMuted">Avg size ₹38k</p>
+                <p className="text-[10px] text-crm-textMuted">Avg size ₹38,000</p>
               </div>
               <div className="p-3 bg-crm-surface rounded border border-crm-border/60">
                 <span className="text-[10px] text-crm-textMuted uppercase font-semibold">Client Accounts</span>
@@ -234,7 +235,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ enable
           <WidgetContainer
             title="Finance Pulse"
             subtitle="Cashflow & net liquidity"
-            badge={`Net ₹${(financeMetrics.netRevenue / 1000).toFixed(0)}k`}
+            badge={`Net ${formatINR(financeMetrics.netRevenue, { compact: true })}`}
             badgeType="primary"
           >
             <div className="space-y-2.5 text-xs">

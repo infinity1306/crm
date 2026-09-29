@@ -18,6 +18,7 @@ import {
   Clock
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
+import { formatINR } from '../../../utils/indianNumberSystem';
 
 export const SalesDashboard: React.FC = () => {
   const { leads, deals, salesMetrics, navigateTo } = useCRM();
@@ -226,7 +227,7 @@ export const SalesDashboard: React.FC = () => {
                 <div className="text-right">
                   <div className="font-bold text-turquoise">₹{(s.val / 100000).toFixed(1)}L</div>
                   <div className="text-[10px] text-crm-textMuted">
-                    Avg: ₹{(s.count > 0 ? (s.val / s.count) / 1000 : 0).toFixed(0)}k
+                    Avg: {formatINR(s.count > 0 ? (s.val / s.count) : 0, { compact: true })}
                   </div>
                 </div>
               </div>

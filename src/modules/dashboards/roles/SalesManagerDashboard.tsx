@@ -8,6 +8,7 @@ import { WidgetContainer } from '../components/WidgetContainer';
 import { Avatar } from '../../../components/ui/Avatar';
 import { Badge } from '../../../components/ui/Badge';
 import { WidgetId } from '../types';
+import { formatINR } from '../../../utils/indianNumberSystem';
 import { 
   Users, 
   Target, 
@@ -73,8 +74,8 @@ export const SalesManagerDashboard: React.FC<SalesManagerDashboardProps> = ({ en
     { id: 'team-fu', label: 'Follow-ups Completed', value: `${followUps.length}`, context: 'Pipeline touchpoints', icon: Clock, onClick: () => navigateTo('/app/sales/activities') },
     { id: 'team-proposals', label: 'Proposals In Play', value: `${proposalsInPlay}`, context: 'Active proposals', icon: FileText, onClick: () => navigateTo('/app/sales/pipeline') },
     { id: 'team-conversions', label: 'Deals Won', value: `${dealsWonCount}`, change: `${dealsWonCount > 0 ? 'Active conversions' : 'Awaiting close'}`, isPositive: dealsWonCount > 0, icon: TrendingUp, onClick: () => navigateTo('/app/sales/pipeline') },
-    { id: 'team-pipeline', label: 'Total Sales Pipeline', value: `₹${(activePipelineVal / 1000).toFixed(0)}k`, context: `Across ${deals.length} deals`, icon: IndianRupee, onClick: () => navigateTo('/app/sales/pipeline') },
-    { id: 'team-rev', label: 'Closed Team Revenue', value: `₹${(totalWonRevenue / 1000).toFixed(0)}k`, context: 'Total settled revenue', icon: Target, onClick: () => navigateTo('/app/sales/overview') }
+    { id: 'team-pipeline', label: 'Total Sales Pipeline', value: formatINR(activePipelineVal, { compact: true }), context: `Across ${deals.length} deals`, icon: IndianRupee, onClick: () => navigateTo('/app/sales/pipeline') },
+    { id: 'team-rev', label: 'Closed Team Revenue', value: formatINR(totalWonRevenue, { compact: true }), context: 'Total settled revenue', icon: Target, onClick: () => navigateTo('/app/sales/overview') }
   ];
 
   const stagnantDeals = deals.filter(d => d.stage === 'proposal' || d.stage === 'negotiation').slice(0, 3);
@@ -146,7 +147,7 @@ export const SalesManagerDashboard: React.FC<SalesManagerDashboardProps> = ({ en
                       <td className="py-2.5 text-center font-mono text-turquoise">{rep.proposals}</td>
                       <td className="py-2.5 text-center font-mono text-emerald-400 font-bold">{rep.won}</td>
                       <td className="py-2.5 text-right font-mono font-bold text-emerald-400">
-                        ₹{(rep.revenue / 1000).toFixed(0)}k
+                        {formatINR(rep.revenue, { compact: true })}
                       </td>
                     </tr>
                   ))}

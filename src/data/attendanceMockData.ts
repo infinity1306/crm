@@ -8,11 +8,11 @@ import {
 } from '../types/attendance';
 
 export const DEFAULT_ATTENDANCE_CONFIG: AttendanceOrgConfig = {
-  workdayDurationMinutes: 480,
-  expectedStartTime: '09:30',
+  workdayDurationMinutes: 540,
+  expectedStartTime: '10:00',
   gracePeriodMinutes: 15,
-  breakDurationLimitMinutes: 60,
-  overtimeThresholdMinutes: 510,
+  breakDurationLimitMinutes: 40,
+  overtimeThresholdMinutes: 555,
   annualLeaveQuota: 18,
   sickLeaveQuota: 10,
   casualLeaveQuota: 7,

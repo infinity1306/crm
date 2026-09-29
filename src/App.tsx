@@ -46,6 +46,7 @@ import { WorkingNowFloor } from './modules/attendance/WorkingNowFloor';
 import { EmployeeAttendanceProfile } from './modules/attendance/EmployeeAttendanceProfile';
 import { MyAttendanceView } from './modules/attendance/MyAttendanceView';
 import { LeaveManagementDesk } from './modules/leave/LeaveManagementDesk';
+import { CompanyCalendar } from './modules/calendar/CompanyCalendar';
 
 // Phase 5 Finance, Revenue & Billing Modules
 import { FinanceOverview } from './modules/finance/FinanceOverview';
@@ -267,6 +268,10 @@ export const App: React.FC = () => {
 
     if (currentPath === '/app/my-attendance') {
       return <MyAttendanceView />;
+    }
+
+    if (currentPath === '/app/calendar' || currentPath === '/app/company-calendar') {
+      return <CompanyCalendar />;
     }
 
     // Phase 5 Finance, Revenue & Billing Routes

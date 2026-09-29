@@ -3,6 +3,7 @@ import { useCRM } from '../../../context/CRMContext';
 import { WidgetContainer } from '../components/WidgetContainer';
 import { DealStage } from '../../../types/crm';
 import { ChevronRight, IndianRupee, Target } from 'lucide-react';
+import { formatINR } from '../../../utils/indianNumberSystem';
 
 interface PipelineFunnelWidgetProps {
   title?: string;
@@ -73,7 +74,7 @@ export const PipelineFunnelWidget: React.FC<PipelineFunnelWidgetProps> = ({
               {s.count}
             </p>
             <p className="text-[10px] font-mono text-crm-textMuted mt-0.5">
-              ₹{(s.value / 1000).toFixed(0)}k
+              {formatINR(s.value, { compact: true })}
             </p>
           </div>
         ))}

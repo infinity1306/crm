@@ -22,8 +22,8 @@ export const AttendanceCorrectionModal: React.FC<AttendanceCorrectionModalProps>
   const { currentUser, correctAttendance, reviewCorrection, correctionRequests } = useCRM();
 
   const [issueType, setIssueType] = useState<CorrectionIssueType>('FORGOT_CHECKOUT');
-  const [punchIn, setPunchIn] = useState<string>(record?.punchIn || '09:30');
-  const [punchOut, setPunchOut] = useState<string>(record?.punchOut || '18:30');
+  const [punchIn, setPunchIn] = useState<string>(record?.punchIn || '10:00');
+  const [punchOut, setPunchOut] = useState<string>(record?.punchOut || '19:00');
   const [status, setStatus] = useState<AttendanceStatus>(record?.status || 'present');
   const [reason, setReason] = useState<string>('');
   const [reviewNotes, setReviewNotes] = useState<string>('');
@@ -37,8 +37,8 @@ export const AttendanceCorrectionModal: React.FC<AttendanceCorrectionModalProps>
 
   React.useEffect(() => {
     if (record) {
-      setPunchIn(record.punchIn || '09:30');
-      setPunchOut(record.punchOut || '18:30');
+      setPunchIn(record.punchIn || '10:00');
+      setPunchOut(record.punchOut || '19:00');
       setStatus(record.status || 'present');
       setReason('');
       setError(null);

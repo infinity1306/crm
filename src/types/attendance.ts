@@ -28,11 +28,11 @@ export type WorkMode = 'OFFICE' | 'REMOTE' | 'HYBRID' | 'FIELD' | 'BUSINESS_TRAV
 export interface Shift {
   id: string;
   name: string;
-  startTime: string; // HH:mm (e.g. "09:30")
-  endTime: string;   // HH:mm (e.g. "18:30")
-  workMinutes: number; // e.g. 480 (8 hours)
+  startTime: string; // HH:mm (e.g. "10:00")
+  endTime: string;   // HH:mm (e.g. "19:00")
+  workMinutes: number; // e.g. 500 (8h 20m working time)
   graceMinutes: number; // e.g. 15 mins
-  breakMinutes: number; // e.g. 60 mins
+  breakMinutes: number; // e.g. 40 mins
   timezone: string; // "Asia/Kolkata"
   overnight: boolean;
 }
@@ -177,8 +177,8 @@ export interface AttendanceRecord {
   breaks: BreakRecord[];
   totalWorkingMinutes: number; // calculated working time excluding breaks
   breakMinutes: number;
-  expectedStart: string; // default "09:30"
-  expectedWorkMinutes: number; // default 480 (8h)
+  expectedStart: string; // default "10:00"
+  expectedWorkMinutes: number; // default 500 (8h 20m + 40m break = 9h shift 10:00 - 19:00)
   lateMinutes: number; // late duration in minutes
   overtimeMinutes: number; // minutes worked beyond expectedWorkMinutes
   status: AttendanceStatus;
@@ -241,11 +241,11 @@ export interface LeaveBalance {
 }
 
 export interface AttendanceOrgConfig {
-  workdayDurationMinutes: number; // default 480 (8 hours)
-  expectedStartTime: string; // default "09:30"
+  workdayDurationMinutes: number; // default 540 (9 hours: 10:00 AM - 07:00 PM)
+  expectedStartTime: string; // default "10:00"
   gracePeriodMinutes: number; // default 15 minutes
-  breakDurationLimitMinutes: number; // default 60 minutes
-  overtimeThresholdMinutes: number; // default 510 (8.5 hours)
+  breakDurationLimitMinutes: number; // default 40 minutes
+  overtimeThresholdMinutes: number; // default 555 (9.25 hours)
   annualLeaveQuota: number; // default 18 days
   sickLeaveQuota: number; // default 10 days
   casualLeaveQuota: number; // default 7 days
