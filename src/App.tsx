@@ -3,7 +3,7 @@ import { useCRM } from './context/CRMContext';
 import { Sidebar } from './components/shell/Sidebar';
 import { TopNav } from './components/shell/TopNav';
 import { CommandPalette } from './components/shell/CommandPalette';
-import { InviteEmployeeModal } from './modules/team/InviteEmployeeModal';
+import { AddEmployeeModal } from './modules/team/AddEmployeeModal';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { OverviewDashboard } from './modules/overview/OverviewDashboard';
 import { RoleBasedDashboard } from './modules/dashboards';
@@ -30,6 +30,7 @@ import { SalesActivities } from './modules/sales/activities/SalesActivities';
 import { MeetingsManager } from './modules/sales/meetings/MeetingsManager';
 import { FollowUpManager } from './modules/sales/followups/FollowUpManager';
 import { SalesDashboard } from './modules/sales/overview/SalesDashboard';
+import { SalesDocumentGenerator } from './modules/sales/documents/SalesDocumentGenerator';
 import { ClientCommunication } from './modules/communication/ClientCommunication';
 
 // Phase 3 Delivery & Operations Modules
@@ -76,7 +77,7 @@ import { Button } from './components/ui/Button';
 import { Menu, X, Sparkles, ShieldAlert } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { currentPath, navigateTo, currentUser, isAuthenticated } = useCRM();
+  const { currentPath, navigateTo, currentUser, isAuthenticated, isInviteModalOpen, setInviteModalOpen } = useCRM();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu on route change
@@ -187,6 +188,10 @@ export const App: React.FC = () => {
 
     if (currentPath === '/app/sales/followups') {
       return <FollowUpManager />;
+    }
+
+    if (currentPath === '/app/sales/documents' || currentPath === '/app/sales/proposals' || currentPath === '/app/sales/invoices') {
+      return <SalesDocumentGenerator />;
     }
 
     // Phase 2 Communication Routes
@@ -409,7 +414,7 @@ export const App: React.FC = () => {
 
       {/* Global Command Palette & Modals */}
       <CommandPalette />
-      <InviteEmployeeModal />
+      <AddEmployeeModal isOpen={isInviteModalOpen} onClose={() => setInviteModalOpen(false)} />
       <ToastContainer />
     </div>
   );

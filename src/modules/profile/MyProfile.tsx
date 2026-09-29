@@ -16,14 +16,18 @@ import {
   Check, 
   KeyRound, 
   LogOut,
-  AlertTriangle
+  AlertTriangle,
+  CreditCard,
+  Briefcase,
+  Layers
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
 import { Avatar } from '../../components/ui/Avatar';
 import { Tabs } from '../../components/ui/Tabs';
+import { EmployeeSegmentsView } from './EmployeeSegmentsView';
+import { EmployeeProfileRecord } from '../../types/employeeProfile';
 
 export const MyProfile: React.FC = () => {
   const { 
@@ -34,90 +38,48 @@ export const MyProfile: React.FC = () => {
     addToast 
   } = useCRM();
 
-  const [activeTab, setActiveTab] = useState('personal');
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: currentUser.name,
-    email: currentUser.email,
-    phone: currentUser.phone,
-    designation: currentUser.designation,
-    department: currentUser.department,
-    bio: currentUser.bio || '',
-    timezone: currentUser.timezone,
-    location: currentUser.location || ''
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      updateCurrentUser(formData);
-      setIsLoading(false);
-      setIsEditing(false);
-    }, 400);
-  };
-
-  const handleCancel = () => {
-    setFormData({
-      name: currentUser.name,
-      email: currentUser.email,
-      phone: currentUser.phone,
-      designation: currentUser.designation,
-      department: currentUser.department,
-      bio: currentUser.bio || '',
-      timezone: currentUser.timezone,
-      location: currentUser.location || ''
-    });
-    setIsEditing(false);
-  };
+  const [activeTab, setActiveTab] = useState('segments');
 
   const tabs = [
-    { id: 'personal', label: 'Personal Information' },
-    { id: 'work', label: 'Work Information' },
-    { id: 'preferences', label: 'Preferences' },
+    { id: 'segments', label: '3 Segments: Personal, Bank & Job Details' },
+    { id: 'preferences', label: 'Interface Preferences' },
     { id: 'security', label: 'Security & 2FA' },
     { id: 'sessions', label: 'Active Sessions', count: sessions.length },
   ];
 
+  // Callback when segments are saved to Supabase
+  const handleSegmentsSaved = (record: EmployeeProfileRecord) => {
+    updateCurrentUser({
+      name: record.personal.name,
+      email: record.personal.email,
+      phone: record.personal.mobileNumber,
+      designation: record.job.designation,
+      department: record.job.team as any,
+      location: record.personal.currentAddress
+    });
+  };
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto pb-10">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-crm-border">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-crm-text">
-              My Profile & Settings
+              My Profile & Personnel Segments
             </h1>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-crm-surface text-turquoise border border-turquoise/30 uppercase">
               {currentUser.role.replace('_', ' ')}
             </span>
           </div>
           <p className="text-xs text-crm-textSecondary mt-0.5">
-            Manage your personal profile, credentials, notifications and active device sessions.
+            Manage your personal data, bank payroll account, and job details. All fields are compulsory and synchronized to Supabase PostgreSQL.
           </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isEditing ? (
-            <>
-              <Button variant="ghost" size="sm" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button variant="primary" size="sm" isLoading={isLoading} onClick={handleSave} leftIcon={<Save className="w-3.5 h-3.5" />}>
-                Save Changes
-              </Button>
-            </>
-          ) : (
-            <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
-              Edit Profile
-            </Button>
-          )}
         </div>
       </div>
 
       {/* User Hero Banner */}
-      <Card className="p-6">
+      <Card className="p-6 relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
           <Avatar 
             name={currentUser.name} 
@@ -126,135 +88,45 @@ export const MyProfile: React.FC = () => {
             className="w-18 h-18 text-xl" 
           />
           <div className="text-center sm:text-left space-y-1.5 flex-1">
-            <h2 className="text-lg font-bold text-crm-text">{currentUser.name}</h2>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+              <h2 className="text-lg font-bold text-crm-text">{currentUser.name}</h2>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-turquoise/15 text-turquoise border border-turquoise/25">
+                ID: {currentUser.id.toUpperCase()}
+              </span>
+            </div>
+
             <p className="text-xs text-turquoise font-medium">
               {currentUser.designation} • {currentUser.department}
             </p>
             <p className="text-xs text-crm-textMuted max-w-xl leading-relaxed">
-              {currentUser.bio}
+              {currentUser.bio || 'Employee at Star Chain Labs enterprise operations.'}
             </p>
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-2 text-xs text-crm-textSecondary font-mono">
               <span>{currentUser.email}</span>
               <span>•</span>
               <span>{currentUser.phone}</span>
               <span>•</span>
-              <span>{currentUser.location}</span>
+              <span>{currentUser.location || 'Headquarters'}</span>
             </div>
           </div>
         </div>
       </Card>
 
-      {/* Tabs */}
+      {/* Main Navigation Tabs */}
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      {/* Tab: Personal Information */}
-      {activeTab === 'personal' && (
-        <Card>
-          <div className="flex items-center justify-between pb-3 border-b border-crm-border mb-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-crm-textSecondary">
-              Personal Information
-            </h3>
-            {isEditing && <span className="text-[11px] text-turquoise">Editing Mode</span>}
-          </div>
-
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Full Legal Name"
-                disabled={!isEditing}
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-
-              <Input
-                label="Work Email (SSO Principal)"
-                disabled
-                value={formData.email}
-                helperText="Email is bound to Star Chain Labs Google Workspace"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Mobile Phone Number"
-                disabled={!isEditing}
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-
-              <Input
-                label="Primary Work Location"
-                disabled={!isEditing}
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-crm-textSecondary uppercase tracking-wider mb-1">
-                Executive Bio / Summary
-              </label>
-              <textarea
-                disabled={!isEditing}
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                rows={3}
-                className="w-full p-2.5 rounded-md bg-crm-surface border border-crm-border text-xs text-crm-text placeholder:text-crm-textDim focus:outline-none focus:border-turquoise disabled:opacity-75 disabled:cursor-not-allowed"
-              />
-            </div>
-
-            {isEditing && (
-              <div className="flex justify-end gap-2 pt-3 border-t border-crm-border">
-                <Button variant="ghost" size="sm" type="button" onClick={handleCancel}>
-                  Cancel
-                </Button>
-                <Button variant="primary" size="sm" type="submit" isLoading={isLoading}>
-                  Save Changes
-                </Button>
-              </div>
-            )}
-          </form>
-        </Card>
-      )}
-
-      {/* Tab: Work Information */}
-      {activeTab === 'work' && (
-        <Card>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-crm-textSecondary mb-4">
-            Organizational Employment Context
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
-            <div>
-              <span className="text-crm-textMuted block text-[11px]">Assigned Department</span>
-              <span className="font-medium text-crm-text">{currentUser.department}</span>
-            </div>
-            <div>
-              <span className="text-crm-textMuted block text-[11px]">Official Designation</span>
-              <span className="font-medium text-crm-text">{currentUser.designation}</span>
-            </div>
-            <div>
-              <span className="text-crm-textMuted block text-[11px]">System Role</span>
-              <span className="font-mono text-turquoise uppercase">{currentUser.role}</span>
-            </div>
-            <div>
-              <span className="text-crm-textMuted block text-[11px]">Date Joined</span>
-              <span className="font-mono text-crm-text">{currentUser.joinedDate}</span>
-            </div>
-            <div>
-              <span className="text-crm-textMuted block text-[11px]">Direct Reports</span>
-              <span className="font-medium text-crm-text">{currentUser.directReports} team members</span>
-            </div>
-            <div>
-              <span className="text-crm-textMuted block text-[11px]">Work Arrangement</span>
-              <span className="font-medium text-crm-text">Hybrid (Bengaluru HQ)</span>
-            </div>
-          </div>
-        </Card>
+      {/* Tab: 3 Segments (Personal, Bank, Job Details) */}
+      {activeTab === 'segments' && (
+        <EmployeeSegmentsView
+          targetEmployeeId={currentUser.id}
+          onUpdateSuccess={handleSegmentsSaved}
+          showCardHeader={true}
+        />
       )}
 
       {/* Tab: Preferences */}
       {activeTab === 'preferences' && (
-        <Card>
+        <Card className="p-5">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-crm-textSecondary mb-4">
             Interface & Notification Preferences
           </h3>
@@ -290,7 +162,7 @@ export const MyProfile: React.FC = () => {
 
       {/* Tab: Security */}
       {activeTab === 'security' && (
-        <Card>
+        <Card className="p-5">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-crm-textSecondary mb-4">
             Security & Authentication Baseline
           </h3>
@@ -326,7 +198,7 @@ export const MyProfile: React.FC = () => {
 
       {/* Tab: Sessions */}
       {activeTab === 'sessions' && (
-        <Card>
+        <Card className="p-5">
           <div className="flex items-center justify-between pb-3 border-b border-crm-border mb-4">
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-crm-textSecondary">

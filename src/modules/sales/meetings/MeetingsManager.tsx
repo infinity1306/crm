@@ -18,7 +18,12 @@ import {
   ArrowRight, 
   ExternalLink,
   Building2,
-  Users
+  Users,
+  MessageCircle,
+  Copy,
+  Check,
+  CalendarPlus,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
@@ -29,6 +34,7 @@ export const MeetingsManager: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [outcomeMeeting, setOutcomeMeeting] = useState<Meeting | null>(null);
+  const [copiedMeetId, setCopiedMeetId] = useState<string | null>(null);
 
   const filteredMeetings = useMemo(() => {
     return meetings.filter(m => {
@@ -212,6 +218,54 @@ export const MeetingsManager: React.FC = () => {
               <div className="p-2.5 rounded bg-crm-surface/50 border border-crm-border/50 text-crm-textSecondary text-xs">
                 <strong className="text-crm-textMuted font-medium mr-1.5">Agenda:</strong>
                 {meeting.agenda}
+              </div>
+
+              {/* Meeting Access Matrix (Sales Rep, Harshit, Client) */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-2 rounded bg-crm-surface/60 border border-crm-border text-[11px] font-mono">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-crm-textMuted uppercase text-[10px] font-bold flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-turquoise" />
+                    Access Matrix:
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-crm-card text-turquoise border border-crm-border">
+                    Rep: {meeting.hostEmployeeName || 'Sales Rep'}
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-800/40 font-bold">
+                    Lead: Harshit Sharma
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-sky-950/40 text-sky-300 border border-sky-800/40">
+                    Client: {meeting.clientName}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {meeting.meetingUrl && (
+                    <>
+                      <button
+                        onClick={() => {
+                          const text = `STAR CHAIN LABS — Google Meet Invite\nMeeting: ${meeting.title}\nDate: ${meeting.date} at ${meeting.time}\nLink: ${meeting.meetingUrl}\nAttendees: Sales Rep (${meeting.hostEmployeeName}), Harshit Sharma, and ${meeting.clientName}`;
+                          navigator.clipboard.writeText(text);
+                          setCopiedMeetId(meeting.id);
+                          setTimeout(() => setCopiedMeetId(null), 2000);
+                        }}
+                        className="p-1 rounded hover:bg-crm-card text-crm-textMuted hover:text-crm-text"
+                        title="Copy Invitation"
+                      >
+                        {copiedMeetId === meeting.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(`Hello ${meeting.clientName},\nYour Google Meet is scheduled: ${meeting.title}\nTime: ${meeting.date} at ${meeting.time}\nGoogle Meet Link: ${meeting.meetingUrl}\nAttendees: ${meeting.hostEmployeeName}, Harshit Sharma, and ${meeting.clientName}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 rounded hover:bg-crm-card text-emerald-400 hover:text-emerald-300"
+                        title="Share on WhatsApp with Client & Harshit"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                      </a>
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Outcome summary if completed */}

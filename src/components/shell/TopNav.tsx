@@ -327,8 +327,8 @@ export const TopNav: React.FC = () => {
                 }}
                 className="w-full flex items-center gap-2.5 px-4 py-2 text-crm-text hover:bg-crm-surface hover:text-turquoise transition-colors text-left"
               >
-                <User className="w-3.5 h-3.5 text-crm-textMuted" />
-                <span>My Profile</span>
+                <User className="w-3.5 h-3.5 text-turquoise" />
+                <span>My Profile & 3 Segments</span>
               </button>
 
               <button

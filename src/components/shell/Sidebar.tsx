@@ -179,9 +179,10 @@ export const Sidebar: React.FC = () => {
       allowedPersonas: ['super_admin', 'sales_exec', 'sales_manager'],
       items: [
         { id: 'sales-overview', label: 'Overview', path: '/app/sales/overview', icon: BarChart3, isImplemented: true },
+        { id: 'sales-documents', label: 'Proposals, Quotes & Invoices', path: '/app/sales/documents', icon: FileSpreadsheet, isImplemented: true },
         { id: 'pipeline', label: 'Pipeline Board', path: '/app/sales/pipeline', icon: Briefcase, isImplemented: true },
         { id: 'activities', label: 'Activities', path: '/app/sales/activities', icon: History, isImplemented: true },
-        { id: 'meetings', label: 'Meetings', path: '/app/sales/meetings', icon: CalendarClock, isImplemented: true },
+        { id: 'meetings', label: 'Meetings & Google Meet', path: '/app/sales/meetings', icon: CalendarClock, isImplemented: true },
         { id: 'followups', label: 'Follow-ups', path: '/app/sales/followups', icon: CheckSquare, isImplemented: true, badge: pendingFollowUpsCount > 0 ? pendingFollowUpsCount : undefined, badgeType: 'warning' },
       ]
     },
@@ -225,6 +226,7 @@ export const Sidebar: React.FC = () => {
       isImplemented: true,
       allowedPersonas: ['super_admin', 'admin', 'hr', 'manager', 'developer', 'sales_exec', 'sales_manager', 'finance'],
       items: [
+        { id: 'my-segments', label: 'My 3 Segments & Profile', path: '/app/profile', icon: UserCheck, isImplemented: true },
         { id: 'employees', label: 'Employees Directory', path: '/app/team', icon: Users, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager', 'developer', 'sales_exec', 'sales_manager', 'finance'], badge: pendingInvitesCount > 0 ? pendingInvitesCount : undefined, badgeType: 'neutral' },
       ]
     },

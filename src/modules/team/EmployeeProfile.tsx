@@ -37,6 +37,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Department, Role, EmployeeStatus } from '../../types';
 import { EmployeeAttendanceProfile } from '../attendance/EmployeeAttendanceProfile';
+import { EmployeeSegmentsView } from '../profile/EmployeeSegmentsView';
 
 interface EmployeeProfileProps {
   employeeId: string;
@@ -109,6 +110,7 @@ export const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employeeId }) 
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
+    { id: 'segments', label: '3 Segments (Personal, Bank, Job)' },
     { id: 'attendance', label: 'Attendance & Operations' },
     { id: 'projects', label: 'Projects', count: employeeProjects.length },
     { id: 'tasks', label: 'Tasks', count: employeeTasks.length },
@@ -242,6 +244,23 @@ export const EmployeeProfile: React.FC<EmployeeProfileProps> = ({ employeeId }) 
         activeTab={activeTab}
         onChange={setActiveTab}
       />
+
+      {/* Tab: 3 Segments (Personal, Bank, Job Details) */}
+      {activeTab === 'segments' && (
+        <EmployeeSegmentsView
+          targetEmployeeId={employee.id}
+          onUpdateSuccess={(rec) => {
+            updateEmployee(employee.id, {
+              name: rec.personal.name,
+              phone: rec.personal.mobileNumber,
+              email: rec.personal.email,
+              designation: rec.job.designation,
+              department: rec.job.team as any
+            });
+          }}
+          showCardHeader={true}
+        />
+      )}
 
       {/* Tab 1: Overview */}
       {activeTab === 'overview' && (

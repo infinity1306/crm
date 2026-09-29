@@ -115,7 +115,7 @@ export const TeamDirectory: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-crm-textSecondary mt-0.5">
-            Manage organization members, onboardings, designations, and granular access tiers.
+            HR Onboarding Console: Direct account provisioning with 3 compulsory segments & credential generation (No token invitations required).
           </p>
         </div>
 
@@ -133,8 +133,9 @@ export const TeamDirectory: React.FC = () => {
             size="sm"
             leftIcon={<UserPlus className="w-3.5 h-3.5" />}
             onClick={() => setInviteModalOpen(true)}
+            className="bg-turquoise text-slate-950 font-bold hover:bg-turquoise/90"
           >
-            + Invite Employee
+            + Add Employee (HR Onboarding)
           </Button>
         </div>
       </div>
