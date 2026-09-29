@@ -48,6 +48,7 @@ import { MyAttendanceView } from './modules/attendance/MyAttendanceView';
 import { LeaveManagementDesk } from './modules/leave/LeaveManagementDesk';
 import { CompanyCalendar } from './modules/calendar/CompanyCalendar';
 import { RecruitmentTracker } from './modules/recruitment/RecruitmentTracker';
+import { PayrollSheet } from './modules/payroll/PayrollSheet';
 
 // Phase 5 Finance, Revenue & Billing Modules
 import { FinanceOverview } from './modules/finance/FinanceOverview';
@@ -277,6 +278,10 @@ export const App: React.FC = () => {
 
     if (currentPath === '/app/recruitment' || currentPath === '/app/recruitment-tracker') {
       return <RecruitmentTracker />;
+    }
+
+    if (currentPath === '/app/payroll' || currentPath === '/app/payroll/payslips' || currentPath === '/app/payroll-sheet') {
+      return <PayrollSheet />;
     }
 
     // Phase 5 Finance, Revenue & Billing Routes

@@ -190,6 +190,14 @@ export const CommandPalette: React.FC = () => {
       onSelect: () => navigateTo('/app/recruitment')
     },
     {
+      id: 'page-payroll',
+      category: 'Pages',
+      title: 'Payroll Sheet & Payslip Generator (HR & Super Admin)',
+      subtitle: 'Monthly salary matrix, statutory deductions, bank routing & printable payslips',
+      icon: FileSpreadsheet,
+      onSelect: () => navigateTo('/app/payroll')
+    },
+    {
       id: 'page-notifs',
       category: 'Pages',
       title: 'Notifications',

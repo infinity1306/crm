@@ -231,6 +231,7 @@ export const Sidebar: React.FC = () => {
         { id: 'my-segments', label: 'My 3 Segments & Profile', path: '/app/profile', icon: UserCheck, isImplemented: true },
         { id: 'employees', label: 'Employees Directory', path: '/app/team', icon: Users, isImplemented: true, allowedPersonas: ['super_admin', 'admin', 'hr', 'manager', 'developer', 'sales_exec', 'sales_manager', 'finance'], badge: pendingInvitesCount > 0 ? pendingInvitesCount : undefined, badgeType: 'neutral' },
         { id: 'recruitment', label: 'Recruitment Tracker', path: '/app/recruitment', icon: UserPlus, isImplemented: true, allowedPersonas: ['super_admin', 'hr'] },
+        { id: 'payroll', label: 'Payroll Sheet & Payslips', path: '/app/payroll', icon: FileSpreadsheet, isImplemented: true, allowedPersonas: ['super_admin', 'hr'] },
         { id: 'team-calendar', label: 'Offs & Celebrations Calendar', path: '/app/calendar', icon: Calendar, isImplemented: true },
       ]
     },
