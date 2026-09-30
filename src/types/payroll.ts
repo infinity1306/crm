@@ -24,6 +24,7 @@ export interface PayrollRecord {
   panNumber?: string;
   uanNumber?: string;
   joiningDate?: string;
+  payDate?: string;             // e.g. "01/09/2026" or "2026-09-01"
 
   // Attendance & Days
   totalDaysInMonth: number;     // e.g. 30
@@ -35,7 +36,8 @@ export interface PayrollRecord {
   grossSalary: number;          // Total Monthly Gross CTC
   basicSalary: number;          // Usually 50% of gross
   hra: number;                  // House Rent Allowance (usually 25% of gross)
-  specialAllowance: number;     // Special allowance / Conveyance
+  conveyanceAllowance?: number; // Conveyance Allowance
+  specialAllowance: number;     // Special allowance
   performanceBonus: number;     // Variable / Incentive
   totalEarnings: number;        // Sum of all earnings
 
@@ -44,6 +46,7 @@ export interface PayrollRecord {
   professionalTax: number;      // Statutory PT (₹200)
   tds: number;                  // Tax Deducted at Source (Income Tax)
   otherDeductions: number;      // LOP or advances
+  nonPayable?: number;          // Non-payable / LOP deduction
   totalDeductions: number;      // Sum of all deductions
 
   // Final Net Pay

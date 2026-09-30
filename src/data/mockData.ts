@@ -31,8 +31,29 @@ export const INITIAL_CURRENT_USER: Employee = {
   documentsCount: 0,
 };
 
+export const PRIYANKA_EMPLOYEE: Employee = {
+  id: 'scl-625-014',
+  name: 'Priyanka Gopal Biyani',
+  email: 'priyanka.biyani@starchainlabs.com',
+  phone: '+91 98260 12345',
+  designation: 'Operations Analyst',
+  department: 'Operations',
+  role: 'employee',
+  status: 'active',
+  joinedDate: '2026-08-13',
+  lastActive: '10 mins ago',
+  bio: 'Operations analyst supporting business operations at Star Chain Labs.',
+  timezone: 'Asia/Kolkata (IST)',
+  location: 'Bhopal Office',
+  directReports: 0,
+  skills: ['Operations', 'Data Analysis', 'Reporting'],
+  notesCount: 0,
+  documentsCount: 0,
+};
+
 export const INITIAL_EMPLOYEES: Employee[] = [
-  INITIAL_CURRENT_USER
+  INITIAL_CURRENT_USER,
+  PRIYANKA_EMPLOYEE
 ];
 
 export const INITIAL_INVITATIONS: Invitation[] = [];

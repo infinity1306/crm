@@ -10,10 +10,10 @@ const PAYROLL_STORAGE_KEY = 'scl_payroll_records_v1';
 
 /**
  * Converts a numeric amount to Indian currency words format
- * e.g. 125500 -> "Rupees One Lakh Twenty Five Thousand Five Hundred Only"
+ * e.g. 11035 -> "Indian Rupee Eleven Thousand Thirty-Five Only"
  */
 export function convertNumberToWordsIndian(num: number): string {
-  if (num === 0) return 'Rupees Zero Only';
+  if (num === 0) return 'Indian Rupee Zero Only';
 
   const a = [
     '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
@@ -24,15 +24,45 @@ export function convertNumberToWordsIndian(num: number): string {
   function inWords(n: number): string {
     if (n < 20) return a[n];
     const digit = n % 10;
-    if (n < 100) return b[Math.floor(n / 10)] + (digit ? ' ' + a[digit] : '');
-    if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' and ' + inWords(n % 100) : '');
+    if (n < 100) return b[Math.floor(n / 10)] + (digit ? '-' + a[digit] : '');
+    if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + inWords(n % 100) : '');
     if (n < 100000) return inWords(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 !== 0 ? ' ' + inWords(n % 1000) : '');
     if (n < 10000000) return inWords(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 !== 0 ? ' ' + inWords(n % 100000) : '');
     return inWords(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 !== 0 ? ' ' + inWords(n % 10000000) : '');
   }
 
   const rounded = Math.round(num);
-  return `Rupees ${inWords(rounded)} Only`;
+  return `Indian Rupee ${inWords(rounded).trim()} Only`;
+}
+
+/**
+ * Formats a number to Indian currency format with explicit 2 decimals
+ * e.g. 11035 -> "₹11,035.00"
+ */
+export function formatINRWithDecimals(num: number = 0): string {
+  const parts = Math.abs(num).toFixed(2).split('.');
+  const whole = parseInt(parts[0], 10);
+  const formattedWhole = isNaN(whole) ? '0' : whole.toLocaleString('en-IN');
+  return `₹${formattedWhole}.${parts[1]}`;
+}
+
+/**
+ * Formats date string to DD/MM/YYYY
+ * e.g. "2026-08-13" -> "13/08/2026"
+ */
+export function formatIndianDate(dateStr?: string): string {
+  if (!dateStr) return '—';
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  } catch {
+    return dateStr;
+  }
 }
 
 /**
@@ -41,35 +71,38 @@ export function convertNumberToWordsIndian(num: number): string {
 export function calculateSalaryBreakdown(gross: number, paidDays: number = 30, totalDays: number = 30) {
   // Pro-rate if loss of pay
   const dayRatio = totalDays > 0 ? paidDays / totalDays : 1;
-  const effectiveGross = Math.round(gross * dayRatio);
+  const nonPayable = paidDays < totalDays ? Math.max(0, Math.round(gross * ((totalDays - paidDays) / totalDays))) : 0;
 
-  const basicSalary = Math.round(effectiveGross * 0.50);
-  const hra = Math.round(effectiveGross * 0.25);
-  const specialAllowance = Math.round(effectiveGross * 0.20);
-  const performanceBonus = Math.round(effectiveGross * 0.05);
-  const totalEarnings = basicSalary + hra + specialAllowance + performanceBonus;
+  const basicSalary = Math.round(gross * 0.50);
+  const hra = Math.round(gross * 0.25);
+  const conveyanceAllowance = Math.round(gross * 0.10);
+  const specialAllowance = Math.max(0, gross - (basicSalary + hra + conveyanceAllowance));
+  const performanceBonus = 0;
+  const totalEarnings = basicSalary + hra + conveyanceAllowance + specialAllowance + performanceBonus;
 
   // Deductions
   const providentFund = basicSalary >= 15000 ? 1800 : Math.round(basicSalary * 0.12);
-  const professionalTax = 200; // Standard Karnataka/Maharashtra PT
+  const professionalTax = 200; // Standard PT
   let tds = 0;
   if (gross >= 150000) tds = 15000;
   else if (gross >= 100000) tds = 7500;
   else if (gross >= 60000) tds = 2500;
 
-  const totalDeductions = providentFund + professionalTax + tds;
+  const totalDeductions = providentFund + professionalTax + tds + nonPayable;
   const netSalary = Math.max(0, totalEarnings - totalDeductions);
 
   return {
     grossSalary: gross,
     basicSalary,
     hra,
+    conveyanceAllowance,
     specialAllowance,
     performanceBonus,
     totalEarnings,
     providentFund,
     professionalTax,
     tds,
+    nonPayable,
     otherDeductions: 0,
     totalDeductions,
     netSalary
@@ -88,12 +121,65 @@ function getStoredRawRecords(): PayrollRecord[] {
   }
 }
 
+export const PRIYANKA_RECORD: PayrollRecord = {
+  id: 'pay-scl-625-014-2026-09',
+  employeeId: 'SCL-625-014',
+  employeeName: 'Priyanka Gopal Biyani',
+  designation: 'Operations Analyst',
+  department: 'Operations',
+  month: 'September 2026',
+  monthCode: '2026-09',
+  year: 2026,
+  bankName: 'HDFC Bank',
+  accountNumber: '50100458923014',
+  ifscCode: 'HDFC0001234',
+  panNumber: 'BPYPB4921K',
+  uanNumber: '101984729104',
+  joiningDate: '13/08/2026',
+  payDate: '01/09/2026',
+  paymentDate: '2026-09-01',
+  totalDaysInMonth: 31,
+  workingDays: 22,
+  paidDays: 19,
+  lopDays: 0,
+  grossSalary: 18000,
+  basicSalary: 13000,
+  hra: 2500,
+  conveyanceAllowance: 1500,
+  specialAllowance: 1000,
+  performanceBonus: 0,
+  totalEarnings: 18000,
+  providentFund: 0,
+  professionalTax: 0,
+  tds: 0,
+  otherDeductions: 0,
+  nonPayable: 6965,
+  totalDeductions: 6965,
+  netSalary: 11035,
+  status: 'paid',
+  paymentMode: 'Direct Bank Transfer',
+  transactionRef: 'NEFT-SCL-928104',
+  remarks: 'Official September 2026 Payslip'
+};
+
 /**
  * Initializes or fetches payroll records for a selected month and syncs with current employees
  */
 export function getPayrollRecords(monthCode: string = '2026-09', employees: any[]): PayrollRecord[] {
   const stored = getStoredRawRecords();
-  const existingForMonth = stored.filter(r => r.monthCode === monthCode);
+  let existingForMonth = stored.filter(r => r.monthCode === monthCode);
+
+  // Guarantee Priyanka's sample payslip is seeded for 2026-09 matching user's exact payslip specification
+  if (monthCode === '2026-09') {
+    const hasPriyanka = existingForMonth.some(r => r.employeeId === 'SCL-625-014' || r.employeeName.toLowerCase().includes('priyanka'));
+    if (!hasPriyanka) {
+      existingForMonth = [PRIYANKA_RECORD, ...existingForMonth];
+      const allStored = [...stored.filter(r => r.id !== PRIYANKA_RECORD.id), PRIYANKA_RECORD];
+      try {
+        localStorage.setItem(PAYROLL_STORAGE_KEY, JSON.stringify(allStored));
+      } catch {}
+    }
+  }
 
   if (existingForMonth.length > 0) {
     return existingForMonth;

@@ -40,6 +40,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
 import { cn } from '../../utils/cn';
+import { CorporatePayslip } from '../../components/payroll/CorporatePayslip';
 
 const MONTH_OPTIONS = [
   { code: '2026-09', label: 'September 2026 (Current)' },
@@ -89,14 +90,18 @@ export const PayrollSheet: React.FC = () => {
     grossSalary: number;
     basicSalary: number;
     hra: number;
+    conveyanceAllowance: number;
     specialAllowance: number;
     performanceBonus: number;
     providentFund: number;
     professionalTax: number;
     tds: number;
     otherDeductions: number;
+    nonPayable: number;
     paidDays: number;
     lopDays: number;
+    joiningDate: string;
+    payDate: string;
     status: PayrollPaymentStatus;
     bankName: string;
     accountNumber: string;
@@ -107,14 +112,18 @@ export const PayrollSheet: React.FC = () => {
     grossSalary: 75000,
     basicSalary: 37500,
     hra: 18750,
+    conveyanceAllowance: 1500,
     specialAllowance: 15000,
-    performanceBonus: 3750,
+    performanceBonus: 0,
     providentFund: 1800,
     professionalTax: 200,
     tds: 0,
     otherDeductions: 0,
+    nonPayable: 0,
     paidDays: 30,
     lopDays: 0,
+    joiningDate: '13/08/2026',
+    payDate: '01/09/2026',
     status: 'pending',
     bankName: 'HDFC Bank',
     accountNumber: '',
@@ -181,14 +190,18 @@ export const PayrollSheet: React.FC = () => {
       grossSalary: record.grossSalary,
       basicSalary: record.basicSalary,
       hra: record.hra,
+      conveyanceAllowance: record.conveyanceAllowance ?? 1500,
       specialAllowance: record.specialAllowance,
-      performanceBonus: record.performanceBonus,
+      performanceBonus: record.performanceBonus || 0,
       providentFund: record.providentFund,
       professionalTax: record.professionalTax,
       tds: record.tds,
-      otherDeductions: record.otherDeductions,
+      nonPayable: record.nonPayable ?? record.otherDeductions ?? 0,
+      otherDeductions: record.otherDeductions || 0,
       paidDays: record.paidDays,
       lopDays: record.lopDays,
+      joiningDate: record.joiningDate || '13/08/2026',
+      payDate: record.payDate || record.paymentDate || '01/09/2026',
       status: record.status,
       bankName: record.bankName,
       accountNumber: record.accountNumber,
@@ -206,11 +219,13 @@ export const PayrollSheet: React.FC = () => {
       grossSalary: newGross,
       basicSalary: calc.basicSalary,
       hra: calc.hra,
+      conveyanceAllowance: calc.conveyanceAllowance,
       specialAllowance: calc.specialAllowance,
       performanceBonus: calc.performanceBonus,
       providentFund: calc.providentFund,
       professionalTax: calc.professionalTax,
-      tds: calc.tds
+      tds: calc.tds,
+      nonPayable: calc.nonPayable
     }));
   };
 
@@ -219,10 +234,12 @@ export const PayrollSheet: React.FC = () => {
     e.preventDefault();
     if (!activeRecord) return;
 
+    const conveyance = editForm.conveyanceAllowance || 0;
     const totalEarnings = 
-      editForm.basicSalary + editForm.hra + editForm.specialAllowance + editForm.performanceBonus;
+      editForm.basicSalary + editForm.hra + conveyance + editForm.specialAllowance + editForm.performanceBonus;
+    const nonPayable = editForm.nonPayable || 0;
     const totalDeductions = 
-      editForm.providentFund + editForm.professionalTax + editForm.tds + editForm.otherDeductions;
+      editForm.providentFund + editForm.professionalTax + editForm.tds + nonPayable + editForm.otherDeductions;
     const netSalary = Math.max(0, totalEarnings - totalDeductions);
 
     const updated: PayrollRecord = {
@@ -230,17 +247,21 @@ export const PayrollSheet: React.FC = () => {
       grossSalary: editForm.grossSalary,
       basicSalary: editForm.basicSalary,
       hra: editForm.hra,
+      conveyanceAllowance: conveyance,
       specialAllowance: editForm.specialAllowance,
       performanceBonus: editForm.performanceBonus,
       totalEarnings,
       providentFund: editForm.providentFund,
       professionalTax: editForm.professionalTax,
       tds: editForm.tds,
+      nonPayable: nonPayable,
       otherDeductions: editForm.otherDeductions,
       totalDeductions,
       netSalary,
       paidDays: editForm.paidDays,
       lopDays: editForm.lopDays,
+      joiningDate: editForm.joiningDate,
+      payDate: editForm.payDate,
       status: editForm.status,
       bankName: editForm.bankName,
       accountNumber: editForm.accountNumber,
@@ -705,179 +726,14 @@ export const PayrollSheet: React.FC = () => {
         </div>
       </div>
 
-      {/* ================= MODAL: PRINTABLE CORPORATE PAYSLIP ================= */}
+      {/* ================= MODAL: OFFICIAL CORPORATE PAYSLIP ================= */}
       {isPayslipModalOpen && activeRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-crm-bg/85 backdrop-blur-md animate-in fade-in overflow-y-auto">
-          <div className="bg-crm-card border border-crm-border rounded-2xl shadow-modal max-w-2xl w-full p-6 space-y-5 my-8 animate-in zoom-in-95">
-            {/* Payslip Header & Controls */}
-            <div className="flex items-center justify-between border-b border-crm-border pb-3 print:hidden">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-turquoise/15 text-turquoise">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-crm-text">Official Employee Pay Slip</h2>
-                  <p className="text-[11px] text-crm-textMuted">Star Chain Labs Pvt Ltd — Payroll Month: {activeRecord.month}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrintPayslip}
-                  leftIcon={<Printer className="w-3.5 h-3.5 text-turquoise" />}
-                  className="text-xs h-8"
-                >
-                  Print / Save PDF
-                </Button>
-
-                <button
-                  onClick={() => setIsPayslipModalOpen(false)}
-                  className="text-crm-textMuted hover:text-crm-text p-1.5 rounded-lg"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Printable Payslip Card Sheet */}
-            <div id="payslip-printable-area" className="p-6 bg-crm-surface/70 border border-crm-border/80 rounded-xl space-y-4 text-xs font-sans">
-              {/* Company Banner */}
-              <div className="border-b border-crm-border/60 pb-3 flex items-center justify-between">
-                <div>
-                  <div className="text-lg font-black tracking-tight text-crm-text flex items-center gap-1.5">
-                    <span className="text-turquoise">STAR CHAIN LABS</span> PRIVATE LIMITED
-                  </div>
-                  <p className="text-[10px] text-crm-textMuted">
-                    Tower B, Tech Innovation Park, Outer Ring Road, Bangalore - 560103, Karnataka, India
-                  </p>
-                  <p className="text-[10px] text-crm-textMuted">CIN: U72900KA2024PTC189012 • PAN: AAHCS4512K</p>
-                </div>
-                <div className="text-right">
-                  <span className="px-2.5 py-1 rounded bg-turquoise/15 text-turquoise font-mono text-xs font-bold border border-turquoise/30">
-                    PAYSLIP
-                  </span>
-                  <div className="text-[11px] font-bold text-crm-text mt-1">{activeRecord.month}</div>
-                </div>
-              </div>
-
-              {/* Employee & Bank Info Matrix */}
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2 p-3 bg-crm-card/60 rounded-lg border border-crm-border/40 text-[11px]">
-                <div className="space-y-1">
-                  <div><span className="text-crm-textMuted">Employee Name:</span> <span className="font-bold text-crm-text ml-1">{activeRecord.employeeName}</span></div>
-                  <div><span className="text-crm-textMuted">Employee ID:</span> <span className="font-mono font-bold text-turquoise ml-1">{activeRecord.employeeId}</span></div>
-                  <div><span className="text-crm-textMuted">Designation:</span> <span className="text-crm-text ml-1">{activeRecord.designation}</span></div>
-                  <div><span className="text-crm-textMuted">Department:</span> <span className="text-crm-text ml-1">{activeRecord.department}</span></div>
-                  <div><span className="text-crm-textMuted">Date of Joining:</span> <span className="font-mono text-crm-text ml-1">{activeRecord.joiningDate || '2025-01-01'}</span></div>
-                </div>
-
-                <div className="space-y-1">
-                  <div><span className="text-crm-textMuted">Bank Name:</span> <span className="text-crm-text ml-1 font-semibold">{activeRecord.bankName}</span></div>
-                  <div><span className="text-crm-textMuted">Bank A/C No:</span> <span className="font-mono text-crm-text ml-1">{activeRecord.accountNumber}</span></div>
-                  <div><span className="text-crm-textMuted">IFSC Code:</span> <span className="font-mono text-crm-text ml-1">{activeRecord.ifscCode}</span></div>
-                  <div><span className="text-crm-textMuted">PAN / UAN:</span> <span className="font-mono text-crm-text ml-1">{activeRecord.panNumber || '—'} / {activeRecord.uanNumber || '—'}</span></div>
-                  <div><span className="text-crm-textMuted">Payment Mode:</span> <span className="font-mono text-emerald-400 font-semibold ml-1">{activeRecord.paymentMode} ({activeRecord.status.toUpperCase()})</span></div>
-                </div>
-              </div>
-
-              {/* Attendance Summary */}
-              <div className="grid grid-cols-4 gap-2 text-center text-[10px] p-2 bg-crm-surface border border-crm-border/40 rounded-lg">
-                <div><span className="text-crm-textMuted block">Total Days</span> <span className="font-bold font-mono text-crm-text">{activeRecord.totalDaysInMonth}</span></div>
-                <div><span className="text-crm-textMuted block">Working Days</span> <span className="font-bold font-mono text-crm-text">{activeRecord.workingDays}</span></div>
-                <div><span className="text-crm-textMuted block">Paid Days</span> <span className="font-bold font-mono text-emerald-400">{activeRecord.paidDays}</span></div>
-                <div><span className="text-crm-textMuted block">Loss of Pay (LOP)</span> <span className="font-bold font-mono text-rose-400">{activeRecord.lopDays}</span></div>
-              </div>
-
-              {/* Earnings & Deductions Tables */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Earnings */}
-                <div className="border border-crm-border rounded-lg overflow-hidden">
-                  <div className="bg-crm-surface/90 px-3 py-1.5 font-bold text-turquoise text-[11px] border-b border-crm-border">
-                    EARNINGS
-                  </div>
-                  <div className="p-3 space-y-1.5 text-[11px]">
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Basic Salary</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.basicSalary)}</span></div>
-                    <div className="flex justify-between"><span className="text-crm-textMuted">House Rent Allowance (HRA)</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.hra)}</span></div>
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Special Allowance</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.specialAllowance)}</span></div>
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Performance Bonus</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.performanceBonus)}</span></div>
-                    <div className="pt-2 border-t border-crm-border/60 flex justify-between font-bold text-crm-text">
-                      <span>Total Earnings (A)</span>
-                      <span className="font-mono text-turquoise">{formatINR(activeRecord.totalEarnings)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Deductions */}
-                <div className="border border-crm-border rounded-lg overflow-hidden">
-                  <div className="bg-crm-surface/90 px-3 py-1.5 font-bold text-rose-400 text-[11px] border-b border-crm-border">
-                    DEDUCTIONS
-                  </div>
-                  <div className="p-3 space-y-1.5 text-[11px]">
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Provident Fund (PF)</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.providentFund)}</span></div>
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Professional Tax (PT)</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.professionalTax)}</span></div>
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Income Tax (TDS)</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.tds)}</span></div>
-                    <div className="flex justify-between"><span className="text-crm-textMuted">Other Deductions / LOP</span> <span className="font-mono text-crm-text">{formatINR(activeRecord.otherDeductions)}</span></div>
-                    <div className="pt-2 border-t border-crm-border/60 flex justify-between font-bold text-rose-300">
-                      <span>Total Deductions (B)</span>
-                      <span className="font-mono">-{formatINR(activeRecord.totalDeductions)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Net Pay Box */}
-              <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">NET SALARY PAYABLE (A - B)</div>
-                  <div className="text-xs text-crm-textMuted italic mt-0.5">
-                    {convertNumberToWordsIndian(activeRecord.netSalary)}
-                  </div>
-                </div>
-                <div className="text-xl font-bold font-mono text-emerald-400">
-                  {formatINR(activeRecord.netSalary)}
-                </div>
-              </div>
-
-              {/* Disclaimer */}
-              <div className="pt-2 border-t border-crm-border/40 text-[10px] text-crm-textMuted text-center italic">
-                This is a confidential computer-generated pay slip issued by Star Chain Labs Private Limited. No physical signature is required.
-              </div>
-            </div>
-
-            {/* Payslip Footer Actions */}
-            <div className="flex items-center justify-between pt-2 border-t border-crm-border print:hidden">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const text = `📄 *Star Chain Labs — Payslip (${activeRecord.month})*\nEmployee: ${activeRecord.employeeName} (${activeRecord.employeeId})\nDesignation: ${activeRecord.designation}\nNet Pay: ₹${activeRecord.netSalary.toLocaleString('en-IN')}\nStatus: ${activeRecord.status.toUpperCase()}\nPayment Mode: ${activeRecord.paymentMode}`;
-                  navigator.clipboard.writeText(text);
-                  addToast({ title: 'Copied', message: 'Payslip details copied to clipboard.', type: 'success' });
-                }}
-                leftIcon={<Copy className="w-3.5 h-3.5 text-turquoise" />}
-              >
-                Copy Text Summary
-              </Button>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsPayslipModalOpen(false)}
-                >
-                  Close
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handlePrintPayslip}
-                  leftIcon={<Printer className="w-3.5 h-3.5" />}
-                >
-                  Print Payslip
-                </Button>
-              </div>
-            </div>
+          <div className="bg-crm-card border border-crm-border rounded-2xl shadow-modal max-w-3xl w-full p-4 sm:p-6 space-y-4 my-8 animate-in zoom-in-95">
+            <CorporatePayslip 
+              record={activeRecord} 
+              onClose={() => setIsPayslipModalOpen(false)} 
+            />
           </div>
         </div>
       )}
@@ -885,14 +741,14 @@ export const PayrollSheet: React.FC = () => {
       {/* ================= MODAL: EDIT SALARY STRUCTURE ================= */}
       {isEditModalOpen && activeRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-crm-bg/85 backdrop-blur-md animate-in fade-in overflow-y-auto">
-          <div className="bg-crm-card border border-crm-border rounded-xl shadow-modal max-w-xl w-full p-5 space-y-4 my-8 animate-in zoom-in-95">
+          <div className="bg-crm-card border border-crm-border rounded-xl shadow-modal max-w-xl w-full p-5 space-y-4 my-8 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-crm-border pb-3">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-turquoise/15 text-turquoise">
                   <Edit3 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-crm-text">Edit Salary Structure & Bank Routing</h2>
+                  <h2 className="text-base font-bold text-crm-text">Edit Salary Structure & Payslip Data</h2>
                   <p className="text-[11px] text-crm-textMuted">{activeRecord.employeeName} ({activeRecord.employeeId}) • {activeRecord.month}</p>
                 </div>
               </div>
@@ -914,22 +770,22 @@ export const PayrollSheet: React.FC = () => {
                   <span className="text-turquoise font-mono font-bold text-sm">₹</span>
                   <input
                     type="number"
-                    min="10000"
-                    step="1000"
+                    min="1000"
+                    step="500"
                     value={editForm.grossSalary}
                     onChange={(e) => handleGrossChange(Number(e.target.value))}
                     className="w-full px-3 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono font-bold text-sm focus:outline-none focus:border-turquoise"
                   />
                 </div>
                 <p className="text-[10px] text-crm-textMuted mt-1">
-                  Changing Gross automatically updates Basic (50%), HRA (25%), Allowances (20%), and statutory PF.
+                  Changing Gross auto-populates Basic (50%), HRA (25%), Conveyance (10%), Allowances, and non-payable LOP.
                 </p>
               </div>
 
               {/* Earnings Breakdown */}
               <div className="p-3 bg-crm-surface/60 rounded-lg border border-crm-border/60 space-y-2">
-                <div className="font-semibold text-turquoise uppercase text-[10px] tracking-wider">Earnings Overrides</div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="font-semibold text-turquoise uppercase text-[10px] tracking-wider">Earnings Breakdown (Monthly)</div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   <div>
                     <label className="block text-crm-textMuted mb-0.5">Basic Salary (₹)</label>
                     <input
@@ -945,6 +801,15 @@ export const PayrollSheet: React.FC = () => {
                       type="number"
                       value={editForm.hra}
                       onChange={(e) => setEditForm({ ...editForm, hra: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-crm-textMuted mb-0.5">Conveyance Allowance (₹)</label>
+                    <input
+                      type="number"
+                      value={editForm.conveyanceAllowance}
+                      onChange={(e) => setEditForm({ ...editForm, conveyanceAllowance: Number(e.target.value) })}
                       className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
                     />
                   </div>
@@ -971,14 +836,32 @@ export const PayrollSheet: React.FC = () => {
 
               {/* Deductions Breakdown */}
               <div className="p-3 bg-crm-surface/60 rounded-lg border border-crm-border/60 space-y-2">
-                <div className="font-semibold text-rose-400 uppercase text-[10px] tracking-wider">Deductions Overrides</div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="font-semibold text-rose-400 uppercase text-[10px] tracking-wider">Deductions Breakdown</div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <div>
+                    <label className="block text-crm-textMuted mb-0.5">Income Tax (₹)</label>
+                    <input
+                      type="number"
+                      value={editForm.tds}
+                      onChange={(e) => setEditForm({ ...editForm, tds: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
+                    />
+                  </div>
                   <div>
                     <label className="block text-crm-textMuted mb-0.5">PF Deduction (₹)</label>
                     <input
                       type="number"
                       value={editForm.providentFund}
                       onChange={(e) => setEditForm({ ...editForm, providentFund: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-crm-textMuted mb-0.5">Non - payable / LOP (₹)</label>
+                    <input
+                      type="number"
+                      value={editForm.nonPayable}
+                      onChange={(e) => setEditForm({ ...editForm, nonPayable: Number(e.target.value) })}
                       className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
                     />
                   </div>
@@ -991,12 +874,48 @@ export const PayrollSheet: React.FC = () => {
                       className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Attendance & Payslip Dates */}
+              <div className="p-3 bg-crm-surface/60 rounded-lg border border-crm-border/60 space-y-2">
+                <div className="font-semibold text-emerald-400 uppercase text-[10px] tracking-wider">Attendance & Key Dates</div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   <div>
-                    <label className="block text-crm-textMuted mb-0.5">TDS / Income Tax (₹)</label>
+                    <label className="block text-crm-textMuted mb-0.5">Paid Days</label>
                     <input
                       type="number"
-                      value={editForm.tds}
-                      onChange={(e) => setEditForm({ ...editForm, tds: Number(e.target.value) })}
+                      value={editForm.paidDays}
+                      onChange={(e) => setEditForm({ ...editForm, paidDays: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-crm-textMuted mb-0.5">LOP Days</label>
+                    <input
+                      type="number"
+                      value={editForm.lopDays}
+                      onChange={(e) => setEditForm({ ...editForm, lopDays: Number(e.target.value) })}
+                      className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-crm-textMuted mb-0.5">Joining Date</label>
+                    <input
+                      type="text"
+                      placeholder="DD/MM/YYYY"
+                      value={editForm.joiningDate}
+                      onChange={(e) => setEditForm({ ...editForm, joiningDate: e.target.value })}
+                      className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-crm-textMuted mb-0.5">Pay Date</label>
+                    <input
+                      type="text"
+                      placeholder="DD/MM/YYYY"
+                      value={editForm.payDate}
+                      onChange={(e) => setEditForm({ ...editForm, payDate: e.target.value })}
                       className="w-full px-2.5 py-1.5 rounded bg-crm-surface border border-crm-border text-crm-text font-mono"
                     />
                   </div>
